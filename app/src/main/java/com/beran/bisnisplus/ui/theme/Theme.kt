@@ -45,11 +45,11 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun BisnisPlusTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
+        // ** disable dynamic color for all devices
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -64,9 +64,6 @@ fun BisnisPlusTheme(
         val currentWindow = (view.context as? Activity)?.window
             ?: throw Exception("Not in an Activity - Unable to get window reference")
         SideEffect {
-            // ** this code deprecated in java
-//            (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
-//            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
             currentWindow.statusBarColor = colorScheme.primary.toArgb()
             WindowCompat.getInsetsController(currentWindow, view).isAppearanceLightStatusBars =
                 darkTheme
