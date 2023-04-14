@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Bisnis Plus</string>
+    <string name="catatan_keuangan_usaha_kamu">Catatan keuangan\nusaha kamu</string>
+    <string name="app_logo_desc">App logo</string>
 </resources>

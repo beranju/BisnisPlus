@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -76,13 +77,13 @@ fun Splash(alpha: Float) {
             Spacer(modifier = Modifier.height(10.dp))
             Image(
                 painter = painterResource(id = R.drawable.app_logo),
-                contentDescription = "App logo",
+                contentDescription = stringResource(R.string.app_logo_desc),
                 modifier = Modifier
                     .size(120.dp)
                     .alpha(alpha = alpha)
             )
             Text(
-                text = "Catatan keuangan\nusaha kamu",
+                text = stringResource(R.string.catatan_keuangan_usaha_kamu),
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Clip,
                 style = MaterialTheme.typography.bodyMedium
