@@ -12,7 +12,7 @@ import com.beran.bisnisplus.ui.screen.SplashScreen
 fun SetupNavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
         composable(route = Screen.Splash.route){
-            SplashScreen()
+            SplashScreen(navController)
         }
         composable(route = Screen.Home.route){
             HomeScreen()
