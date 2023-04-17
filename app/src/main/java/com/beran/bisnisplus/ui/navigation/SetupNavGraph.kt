@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.beran.bisnisplus.ui.navigation.Screen
 import com.beran.bisnisplus.ui.screen.HomeScreen
+import com.beran.bisnisplus.ui.screen.OnBoardingScreen
 import com.beran.bisnisplus.ui.screen.SplashScreen
 
 @Composable
@@ -16,6 +17,9 @@ fun SetupNavGraph(navController: NavHostController) {
         }
         composable(route = Screen.Home.route){
             HomeScreen()
+        }
+        composable(route = Screen.OnBoard.route){
+            OnBoardingScreen(navController = navController)
         }
 
     }

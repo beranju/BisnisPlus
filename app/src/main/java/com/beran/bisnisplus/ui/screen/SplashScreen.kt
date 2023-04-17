@@ -56,7 +56,7 @@ fun SplashScreen(navController: NavHostController) {
          * ...when click navigate back
          */
         navController.popBackStack()
-        navController.navigate(Screen.Home.route)
+        navController.navigate(Screen.OnBoard.route)
     }
     Splash(alpha = alphaAnim.value)
 }

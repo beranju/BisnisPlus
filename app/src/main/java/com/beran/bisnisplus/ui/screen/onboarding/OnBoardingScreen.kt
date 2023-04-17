@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -27,8 +29,9 @@ import com.beran.bisnisplus.ui.screen.onboarding.SecondOnBoardingScreen
 import com.beran.bisnisplus.ui.screen.onboarding.ThirdOnBoardingScreen
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun OnBoardingScreen(navController: NavHostController) {
     /**
@@ -43,30 +46,37 @@ fun OnBoardingScreen(navController: NavHostController) {
         val pageCount = 3
 
         HorizontalPager(pageCount = pageCount, state = pagerState) { page ->
-            when (page) {
-                0 -> FirstOnBoardingScreen(
-                    onNext = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(1)
+            Box(modifier = Modifier.graphicsLayer {
+                val pageOffset =
+                    ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
+                translationX = pageOffset * size.width
+                alpha = 1 - pageOffset.absoluteValue
+            }) {
+                when (page) {
+                    0 -> FirstOnBoardingScreen(
+                        onNext = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(1)
+                            }
+                        },
+                        onSkip = {
+                            navController.navigate(Screen.Home.route)
                         }
-                    },
-                    onSkip = {
-                        navController.navigate(Screen.Home.route)
-                    }
-                )
+                    )
 
-                1 -> SecondOnBoardingScreen(
-                    onNext = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(2)
+                    1 -> SecondOnBoardingScreen(
+                        onNext = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(2)
+                            }
+                        },
+                        onSkip = {
+                            navController.navigate(Screen.Home.route)
                         }
-                    },
-                    onSkip = {
-                        navController.navigate(Screen.Home.route)
-                    }
-                )
+                    )
 
-                2 -> ThirdOnBoardingScreen(onNext = { navController.navigate(Screen.Home.route) })
+                    2 -> ThirdOnBoardingScreen(onNext = { navController.navigate(Screen.Home.route) })
+                }
             }
         }
         Row(
