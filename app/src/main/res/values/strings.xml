@@ -2,4 +2,11 @@
     <string name="app_name">Bisnis Plus</string>
     <string name="catatan_keuangan_usaha_kamu">Catatan keuangan\nusaha kamu</string>
     <string name="app_logo_desc">App logo</string>
+    <string name="txt_selanjutnya">Selanjutnya</string>
+    <string name="onboarding_image_desc">OnBoarding Image</string>
+    <string name="txt_first_onboard_desc">Kami membantu anda mengelola keuangan anda dengan aman</string>
+    <string name="txt_skip">Skip</string>
+    <string name="txt_second_onboard_desc">Dengan berbagai fitur yang akan memudahkan kamu seperti pembukuan, statistik serta tagihan</string>
+    <string name="txt_third_onboard_desc">Mulai catat transaksi bisnis anda sekarang</string>
+    <string name="txt_mulai">Mulai</string>
 </resources>
