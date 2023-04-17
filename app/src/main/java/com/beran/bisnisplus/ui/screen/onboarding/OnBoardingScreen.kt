@@ -60,7 +60,7 @@ fun OnBoardingScreen(navController: NavHostController) {
                             }
                         },
                         onSkip = {
-                            navController.navigate(Screen.Home.route)
+                            navController.navigate(Screen.SignUp.route)
                         }
                     )
 
@@ -71,11 +71,11 @@ fun OnBoardingScreen(navController: NavHostController) {
                             }
                         },
                         onSkip = {
-                            navController.navigate(Screen.Home.route)
+                            navController.navigate(Screen.SignUp.route)
                         }
                     )
 
-                    2 -> ThirdOnBoardingScreen(onNext = { navController.navigate(Screen.Home.route) })
+                    2 -> ThirdOnBoardingScreen(onNext = { navController.navigate(Screen.SignUp.route) })
                 }
             }
         }

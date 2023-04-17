@@ -49,6 +49,14 @@ val Typography = Typography(
         letterSpacing = 0.sp
     ),
 
+    labelMedium = TextStyle(
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    )
+
     /* Other default text styles to override
 
     labelSmall = TextStyle(

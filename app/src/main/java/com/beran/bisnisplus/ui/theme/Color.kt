@@ -31,3 +31,5 @@ val Blue40 = Color(0xFF3b6470)
 val White = Color(0xFFffffff)
 val White40 = Color(0xFFfbfdf8)
 
+val OutlineColor = Color(0xFF717971)
+

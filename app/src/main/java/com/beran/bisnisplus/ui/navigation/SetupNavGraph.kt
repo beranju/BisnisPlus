@@ -8,6 +8,7 @@ import com.beran.bisnisplus.ui.navigation.Screen
 import com.beran.bisnisplus.ui.screen.HomeScreen
 import com.beran.bisnisplus.ui.screen.OnBoardingScreen
 import com.beran.bisnisplus.ui.screen.SplashScreen
+import com.beran.bisnisplus.ui.screen.auth.SignUpScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
@@ -20,6 +21,9 @@ fun SetupNavGraph(navController: NavHostController) {
         }
         composable(route = Screen.OnBoard.route){
             OnBoardingScreen(navController = navController)
+        }
+        composable(route = Screen.SignUp.route){
+            SignUpScreen(navController = navController)
         }
 
     }
