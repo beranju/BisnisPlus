@@ -43,7 +43,7 @@ import com.beran.bisnisplus.ui.component.CustomTextField
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
-fun SignUpScreen() {
+fun SignUpScreen(navigateToSignDataBisnis: () -> Unit) {
 
     var name by remember {
         mutableStateOf("")
@@ -139,7 +139,7 @@ fun SignUpScreen() {
                     text = "Sudah punya akun?",
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp)
                 )
-                TextButton(onClick = { }) {
+                TextButton(onClick = navigateToSignDataBisnis) {
                     Text(
                         text = "Login",
                         style = MaterialTheme.typography.bodyMedium
@@ -155,7 +155,7 @@ fun SignUpScreen() {
 @Composable
 fun SignUpScreenPrev() {
     BisnisPlusTheme {
-        SignUpScreen()
+        SignUpScreen(navigateToSignDataBisnis = {})
     }
 
 }
