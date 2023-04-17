@@ -45,7 +45,8 @@ fun CustomTextField(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = OutlineColor,
-                focusedTextColor = MaterialTheme.colorScheme.onBackground
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground
             ),
             visualTransformation = visualTransformation,
             keyboardOptions = KeyboardOptions(keyboardType = keyBoardType),

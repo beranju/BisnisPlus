@@ -1,5 +1,6 @@
 package com.beran.bisnisplus.ui.screen.auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -79,7 +80,7 @@ fun SignUpScreen(navController: NavHostController) {
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp),
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             CustomTextField(
                 labelText = stringResource(R.string.txt_name),
                 hintText = stringResource(R.string.txt_name_hint),
@@ -119,14 +120,14 @@ fun SignUpScreen(navController: NavHostController) {
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-            Spacer(modifier = Modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             Text(
                 text = stringResource(R.string.atau_daftar_dengan),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp)
             )
             Spacer(modifier = Modifier.height(20.dp))
-            Icon(
+            Image(
                 painter = painterResource(id = R.drawable.icon_google),
                 contentDescription = "Icon Google",
                 modifier = Modifier.size(45.dp)
