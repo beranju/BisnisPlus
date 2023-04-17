@@ -18,7 +18,6 @@ import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,14 +38,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.beran.bisnisplus.R
 import com.beran.bisnisplus.ui.component.CustomTextField
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
-fun SignUpScreen(navController: NavHostController) {
+fun SignUpScreen() {
 
     var name by remember {
         mutableStateOf("")
@@ -158,7 +155,7 @@ fun SignUpScreen(navController: NavHostController) {
 @Composable
 fun SignUpScreenPrev() {
     BisnisPlusTheme {
-        SignUpScreen(navController = rememberNavController())
+        SignUpScreen()
     }
 
 }

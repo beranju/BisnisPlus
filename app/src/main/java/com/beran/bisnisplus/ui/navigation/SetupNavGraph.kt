@@ -23,7 +23,7 @@ fun SetupNavGraph(navController: NavHostController) {
             OnBoardingScreen(navController = navController)
         }
         composable(route = Screen.SignUp.route){
-            SignUpScreen(navController = navController)
+            SignUpScreen()
         }
 
     }
