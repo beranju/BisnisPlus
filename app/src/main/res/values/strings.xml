@@ -18,4 +18,14 @@
     <string name="txt_email">Email</string>
     <string name="txt_name_hint">Masukkan Nama Anda</string>
     <string name="txt_name">Nama</string>
+    <string name="txt_sign_data_desc">Lengkapi data usaha anda dulu yaa!</string>
+    <string name="txt_nama_usaha">Nama Usaha</string>
+    <string name="txt_nama_usaha_hint">Masukkan nama usaha anda</string>
+    <string name="txt_jenis_usaha">Jenis Usaha</string>
+    <string name="txt_jenis_usaha_hint">Masukkan jenis usaha anda</string>
+    <string name="txt_komoditas">Komoditas</string>
+    <string name="txt_komoditas_hint">Masukkan komoditas usaha anda</string>
+    <string name="txt_komoditas_exp">*Misalnya Cabai, Bawang, dll</string>
+    <string name="txt_no_telepon">No Telepon</string>
+    <string name="txt_noi_telp_hint">Masukkan no telepon usaha anda</string>
 </resources>
