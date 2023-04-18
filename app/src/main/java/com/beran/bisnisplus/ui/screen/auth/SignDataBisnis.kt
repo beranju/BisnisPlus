@@ -27,12 +27,12 @@ import com.beran.bisnisplus.ui.component.CustomDataFormField
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
-fun SignDataBisnis() {
-    SignDataBisnisContent()
+fun SignDataBisnis(onNavigateToSetPhoto: () -> Unit) {
+    SignDataBisnisContent(onNavigateToSetPhoto = onNavigateToSetPhoto)
 }
 
 @Composable
-fun SignDataBisnisContent() {
+fun SignDataBisnisContent(onNavigateToSetPhoto: () -> Unit) {
     var name by remember {
         mutableStateOf("")
     }
@@ -96,7 +96,7 @@ fun SignDataBisnisContent() {
             )
             Spacer(modifier = Modifier.height(40.dp))
             Button(
-                onClick = {},
+                onClick = onNavigateToSetPhoto,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
@@ -112,6 +112,6 @@ fun SignDataBisnisContent() {
 @Composable
 fun SignDataBisnisPrev() {
     BisnisPlusTheme {
-        SignDataBisnis()
+        SignDataBisnis(onNavigateToSetPhoto = {})
     }
 }

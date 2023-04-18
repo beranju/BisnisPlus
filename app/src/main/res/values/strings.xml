@@ -28,4 +28,5 @@
     <string name="txt_komoditas_exp">*Misalnya Cabai, Bawang, dll</string>
     <string name="txt_no_telepon">No Telepon</string>
     <string name="txt_noi_telp_hint">Masukkan no telepon usaha anda</string>
+    <string name="txt_setphoto_desc">Yeay hampir selesai, Sekarang atur dulu photo anda</string>
 </resources>
