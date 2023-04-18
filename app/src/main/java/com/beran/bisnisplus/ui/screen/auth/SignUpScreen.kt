@@ -106,7 +106,7 @@ fun SignUpScreen(navigateToSignDataBisnis: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(25.dp))
             Button(
-                onClick = {},
+                onClick = navigateToSignDataBisnis,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
@@ -139,7 +139,7 @@ fun SignUpScreen(navigateToSignDataBisnis: () -> Unit) {
                     text = "Sudah punya akun?",
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp)
                 )
-                TextButton(onClick = navigateToSignDataBisnis) {
+                TextButton(onClick = {}) {
                     Text(
                         text = "Login",
                         style = MaterialTheme.typography.bodyMedium
