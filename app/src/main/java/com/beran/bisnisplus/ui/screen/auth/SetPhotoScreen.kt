@@ -2,6 +2,7 @@ package com.beran.bisnisplus.ui.screen.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -58,9 +59,15 @@ fun SetPhotoScreen() {
                     painter = painterResource(id = R.drawable.img_empty_profile),
                     contentDescription = "set photo",
                     contentScale = ContentScale.Crop,
+                    alignment = Alignment.Center,
                     modifier = Modifier
                         .clip(CircleShape)
                         .size(150.dp)
+                        .border(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            shape = CircleShape
+                        )
                 )
                 IconButton(
                     onClick = {},
