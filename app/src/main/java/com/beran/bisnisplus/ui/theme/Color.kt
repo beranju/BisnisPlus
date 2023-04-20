@@ -2,34 +2,45 @@ package com.beran.bisnisplus.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-//val Purple80 = Color(0xFFD0BCFF)
-//val PurpleGrey80 = Color(0xFFCCC2DC)
-//val Pink80 = Color(0xFFEFB8C8)
-//
-//val Purple40 = Color(0xFF6650a4)
-//val PurpleGrey40 = Color(0xFF625b71)
-//val Pink40 = Color(0xFF7D5260)
-
 /**
  * Custom color
  */
 
-val Green80 = Color(0xFF69dc99)
-val GreenGrey80 = Color(0xFFb5ccba)
-val Blue80 = Color(0xFFa3cddb)
-// ** optional color
-val Black = Color(0xFF191c1a)
-val Green100 = Color(0xFF00391e)
-val GreenGrey100 = Color(0xFF213528)
-val Blue100 = Color(0xFF033640)
-val Grey = Color(0xFFe1e3de)
-
+val Green10 = Color(0xFF002110)
+val Green20 = Color(0xFF00391e)
+val Green30 = Color(0xFF00522e)
 val Green40 = Color(0xFF006d3f)
-val GreenGrey40 = Color(0xFF4f6354)
-val Blue40 = Color(0xFF3b6470)
-// ** optional color
-val White = Color(0xFFffffff)
-val White40 = Color(0xFFfbfdf8)
+val Green80 = Color(0xFF69dc99)
+val Green90 = Color(0xFF86f9b3)
 
-val OutlineColor = Color(0xFF717971)
+val GreenGrey10 = Color(0xFF0c1f14)
+val GreenGrey20 = Color(0xFF213528)
+val GreenGrey30 = Color(0xFF374b3d)
+val GreenGrey40 = Color(0xFF4f6354)
+val GreenGrey80 = Color(0xFFb5ccba)
+val GreenGrey90 = Color(0xFFd1e8d5)
+
+val Blue10 = Color(0xFF001f27)
+val Blue20 = Color(0xFF033640)
+val Blue30 = Color(0xFF214c58)
+val Blue40 = Color(0xFF3b6470)
+val Blue80 = Color(0xFFa3cddb)
+val Blue90 = Color(0xFFbee9f7)
+
+val Red10 = Color(0xFF410002)
+val Red20 = Color(0xFF690005)
+val Red30 = Color(0xFF93000a)
+val Red40 = Color(0xFFba1a1a)
+val Red80 = Color(0xFFffb4ab)
+val Red90 = Color(0xFFffdad6)
+
+val Grey10 = Color(0xFF191c1a)
+val Grey30 = Color(0xFF414942)
+val Grey35 = Color(0xFF414942)
+val Grey50 = Color(0xFF717971)
+val Grey60 = Color(0xFF8a938b)
+val Grey80 = Color(0xFFc0c9c0)
+val Grey90 = Color(0xFFdce5db)
+val Grey95 = Color(0xFFe1e3de)
+val Grey99 = Color(0xFFfbfdf8)
 
