@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.beran.bisnisplus.ui.theme.OutlineColor
 
 @Composable
 fun CustomDataFormField(
@@ -34,7 +33,7 @@ fun CustomDataFormField(
                 focusedTextColor = MaterialTheme.colorScheme.onBackground,
                 unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = OutlineColor
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline
             ),
             modifier = Modifier.fillMaxWidth()
         )
