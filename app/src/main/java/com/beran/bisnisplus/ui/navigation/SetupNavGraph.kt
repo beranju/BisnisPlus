@@ -40,7 +40,11 @@ fun SetupNavGraph(navController: NavHostController) {
             )
         }
         composable(route = Screen.SetPhoto.route) {
-            SetPhotoScreen()
+            SetPhotoScreen(
+                onNavigateToSignIn = {
+                    navController.navigate(Screen.SignIn.route)
+                }
+            )
         }
         composable(route = Screen.SignIn.route) {
             LogInScreen {

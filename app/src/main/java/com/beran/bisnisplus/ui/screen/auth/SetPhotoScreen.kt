@@ -36,7 +36,7 @@ import com.beran.bisnisplus.R
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
-fun SetPhotoScreen() {
+fun SetPhotoScreen(onNavigateToSignIn: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -85,7 +85,7 @@ fun SetPhotoScreen() {
             }
             Spacer(modifier = Modifier.height(200.dp))
             Button(
-                onClick = {},
+                onClick = onNavigateToSignIn,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
@@ -112,6 +112,6 @@ fun SetPhotoScreen() {
 @Composable
 fun SetPhotoScreenPrev() {
     BisnisPlusTheme {
-        SetPhotoScreen()
+        SetPhotoScreen(onNavigateToSignIn = {})
     }
 }

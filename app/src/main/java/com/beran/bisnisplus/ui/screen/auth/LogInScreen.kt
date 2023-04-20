@@ -53,7 +53,10 @@ fun LogInScreen(onNavigateToHome: () -> Unit) {
             .fillMaxSize()
             .padding(24.dp)
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
             Text(
                 text = stringResource(R.string.txt_login),
                 textAlign = TextAlign.Start,
@@ -93,7 +96,6 @@ fun LogInScreen(onNavigateToHome: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .background(MaterialTheme.colorScheme.primary)
             ) {
                 Text(
                     text = stringResource(id = R.string.txt_login),
