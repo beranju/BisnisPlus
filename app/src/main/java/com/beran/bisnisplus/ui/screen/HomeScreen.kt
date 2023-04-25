@@ -1,6 +1,8 @@
 package com.beran.bisnisplus.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.InsertChart
@@ -25,11 +29,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.beran.bisnisplus.ui.component.CustomAppBar
 import com.beran.bisnisplus.ui.component.FiturCepatCard
+import com.beran.bisnisplus.ui.component.PembukuanCard
 import com.beran.bisnisplus.ui.component.ProgressCard
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
 fun HomeScreen() {
+    val scrollState = rememberScrollState()
+
     Scaffold(topBar = {
         CustomAppBar(titleAppBar = "Bisnis Plus", showTrailingIcon = true)
     }) { innerPadding ->
@@ -89,6 +96,46 @@ fun HomeScreen() {
                 FiturCepatCard(title = "Buat Buku", icon = Icons.Outlined.StickyNote2)
                 FiturCepatCard(title = "lihat Report", icon = Icons.Outlined.InsertChart)
                 FiturCepatCard(title = "Buat Tagihan", icon = Icons.Outlined.CreditCard)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Pembukuan",
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(
+                    horizontal = 24.dp
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .scrollable(
+                        state = scrollState,
+                        orientation = Orientation.Horizontal
+                    ).padding(horizontal = 16.dp)
+            ) {
+                PembukuanCard()
+                Spacer(modifier = Modifier.width(16.dp))
+                PembukuanCard()
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Hutang",
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(
+                    horizontal = 24.dp
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .scrollable(
+                        state = scrollState,
+                        orientation = Orientation.Horizontal
+                    ).padding(horizontal = 16.dp)
+            ) {
+                PembukuanCard()
+                Spacer(modifier = Modifier.width(16.dp))
+                PembukuanCard()
             }
         }
 
