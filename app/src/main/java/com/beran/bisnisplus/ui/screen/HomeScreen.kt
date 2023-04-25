@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CreditCard
+import androidx.compose.material.icons.outlined.InsertChart
 import androidx.compose.material.icons.outlined.NavigateNext
+import androidx.compose.material.icons.outlined.StickyNote2
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.beran.bisnisplus.ui.component.CustomAppBar
+import com.beran.bisnisplus.ui.component.FiturCepatCard
 import com.beran.bisnisplus.ui.component.ProgressCard
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
@@ -67,11 +71,24 @@ fun HomeScreen() {
                         ProgressCard(value = "20%", subTitle = "Profit", upTrend = true)
                         ProgressCard(value = "10%", subTitle = "Modal", upTrend = true)
                     }
-                    Spacer(modifier = Modifier.height(50.dp))
-                    Row(modifier = Modifier.fillMaxWidth()) {
-
-                    }
                 }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Fitur Cepat",
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(
+                    horizontal = 24.dp
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                FiturCepatCard(title = "Buat Buku", icon = Icons.Outlined.StickyNote2)
+                FiturCepatCard(title = "lihat Report", icon = Icons.Outlined.InsertChart)
+                FiturCepatCard(title = "Buat Tagihan", icon = Icons.Outlined.CreditCard)
             }
         }
 
