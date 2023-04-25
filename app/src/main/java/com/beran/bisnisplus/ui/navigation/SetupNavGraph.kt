@@ -8,6 +8,8 @@ import com.beran.bisnisplus.ui.navigation.Screen
 import com.beran.bisnisplus.ui.screen.HomeScreen
 import com.beran.bisnisplus.ui.screen.OnBoardingScreen
 import com.beran.bisnisplus.ui.screen.SplashScreen
+import com.beran.bisnisplus.ui.screen.auth.LogInScreen
+import com.beran.bisnisplus.ui.screen.auth.SetPhotoScreen
 import com.beran.bisnisplus.ui.screen.auth.SignDataBisnis
 import com.beran.bisnisplus.ui.screen.auth.SignUpScreen
 
@@ -30,8 +32,24 @@ fun SetupNavGraph(navController: NavHostController) {
                 }
             )
         }
-        composable(route = Screen.SignDataBisnis.route){
-            SignDataBisnis()
+        composable(route = Screen.SignDataBisnis.route) {
+            SignDataBisnis(
+                onNavigateToSetPhoto = {
+                    navController.navigate(Screen.SetPhoto.route)
+                }
+            )
+        }
+        composable(route = Screen.SetPhoto.route) {
+            SetPhotoScreen(
+                onNavigateToSignIn = {
+                    navController.navigate(Screen.SignIn.route)
+                }
+            )
+        }
+        composable(route = Screen.SignIn.route) {
+            LogInScreen {
+                navController.navigate(Screen.Home.route)
+            }
         }
 
     }

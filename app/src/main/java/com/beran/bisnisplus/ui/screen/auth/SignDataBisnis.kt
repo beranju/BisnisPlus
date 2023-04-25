@@ -19,18 +19,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.beran.bisnisplus.R
 import com.beran.bisnisplus.ui.component.CustomDataFormField
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
-fun SignDataBisnis() {
-    SignDataBisnisContent()
+fun SignDataBisnis(onNavigateToSetPhoto: () -> Unit) {
+    SignDataBisnisContent(onNavigateToSetPhoto = onNavigateToSetPhoto)
 }
 
 @Composable
-fun SignDataBisnisContent() {
+fun SignDataBisnisContent(onNavigateToSetPhoto: () -> Unit) {
     var name by remember {
         mutableStateOf("")
     }
@@ -52,13 +54,13 @@ fun SignDataBisnisContent() {
         Column(modifier = Modifier.fillMaxWidth()) {
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Lengkapi data usaha anda dulu yaa!",
+                text = stringResource(R.string.txt_sign_data_desc),
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = Modifier.height(30.dp))
             CustomDataFormField(
-                labelName = "Nama Usaha",
-                textHint = "Masukkan nama usaha anda",
+                labelName = stringResource(R.string.txt_nama_usaha),
+                textHint = stringResource(R.string.txt_nama_usaha_hint),
                 value = name,
                 onChangeValue = { newValue ->
                     name = newValue
@@ -66,8 +68,8 @@ fun SignDataBisnisContent() {
             )
             Spacer(modifier = Modifier.height(20.dp))
             CustomDataFormField(
-                labelName = "Jenis Usaha",
-                textHint = "Masukkan jenis usaha anda",
+                labelName = stringResource(R.string.txt_jenis_usaha),
+                textHint = stringResource(R.string.txt_jenis_usaha_hint),
                 value = jenis,
                 onChangeValue = { newValue ->
                     jenis = newValue
@@ -75,18 +77,18 @@ fun SignDataBisnisContent() {
             )
             Spacer(modifier = Modifier.height(20.dp))
             CustomDataFormField(
-                labelName = "Komoditas",
-                textHint = "Masukkan komoditas usaha anda",
+                labelName = stringResource(R.string.txt_komoditas),
+                textHint = stringResource(R.string.txt_komoditas_hint),
                 value = komoditas,
                 onChangeValue = { newValue ->
                     komoditas = newValue
                 }
             )
-            Text(text = "*Misalnya Cabai, Bawang, dll", style = MaterialTheme.typography.bodySmall)
+            Text(text = stringResource(R.string.txt_komoditas_exp), style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(25.dp))
             CustomDataFormField(
-                labelName = "No Telepon",
-                textHint = "Masukkan no telepon usaha anda",
+                labelName = stringResource(R.string.txt_no_telepon),
+                textHint = stringResource(R.string.txt_noi_telp_hint),
                 value = nomor,
                 onChangeValue = { newValue ->
                     nomor = newValue
@@ -94,13 +96,13 @@ fun SignDataBisnisContent() {
             )
             Spacer(modifier = Modifier.height(40.dp))
             Button(
-                onClick = {},
+                onClick = onNavigateToSetPhoto,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
                     .background(MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = "Selanjutnya", style = MaterialTheme.typography.bodyMedium)
+                Text(text = stringResource(id = R.string.txt_selanjutnya), style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
@@ -110,6 +112,6 @@ fun SignDataBisnisContent() {
 @Composable
 fun SignDataBisnisPrev() {
     BisnisPlusTheme {
-        SignDataBisnis()
+        SignDataBisnis(onNavigateToSetPhoto = {})
     }
 }
