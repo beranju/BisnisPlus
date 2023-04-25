@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "15325366275",
+    "project_id": "bisnis-plus",
+    "storage_bucket": "bisnis-plus.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15325366275:android:a6563dab27e2d32cf1a636",
+        "android_client_info": {
+          "package_name": "com.beran.bisnisplus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "15325366275-e9hcipd2no5rqs9op0e10dv4jpco5vpn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwPa2LfuyR8GON4qNhPex7q5oVY-aaey4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "15325366275-e9hcipd2no5rqs9op0e10dv4jpco5vpn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
