@@ -52,8 +52,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PembukuanSection() {
-
+private fun PembukuanSection() {
     Column {
         Spacer(modifier = Modifier.height(16.dp))
         Text(

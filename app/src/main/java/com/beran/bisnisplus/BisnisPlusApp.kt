@@ -30,10 +30,10 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
         topBar = {
             when (currentDestination) {
                 Screen.Home.route -> CustomAppBar(titleAppBar = "Bisnis Plus", true)
-                Screen.Pembukuan.route -> CustomAppBar(titleAppBar = "Pembukuan", true)
-                Screen.Statistik.route -> CustomAppBar(titleAppBar = "Statistik", true)
-                Screen.Pembayaran.route -> CustomAppBar(titleAppBar = "Pembayaran", true)
-                Screen.Setting.route -> CustomAppBar(titleAppBar = "Setting", true)
+                Screen.Pembukuan.route -> CustomAppBar(titleAppBar = "Pembukuan")
+                Screen.Statistik.route -> CustomAppBar(titleAppBar = "Statistik")
+                Screen.Pembayaran.route -> CustomAppBar(titleAppBar = "Pembayaran")
+                Screen.Setting.route -> CustomAppBar(titleAppBar = "Setting")
             }
         },
         bottomBar = {

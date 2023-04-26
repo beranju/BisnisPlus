@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
@@ -27,11 +28,12 @@ fun PembukuanCard(
     judulBuku: String,
     namaAgen: String,
     jenisBuku: String,
-    date: String
+    date: String,
+    width : Dp = 250.dp,
 ) {
     Column(
         modifier = Modifier
-            .width(250.dp)
+            .width(width)
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(10.dp)
