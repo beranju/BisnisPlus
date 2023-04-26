@@ -1,6 +1,7 @@
 package com.beran.bisnisplus.ui.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.NavigateNext
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +23,12 @@ import androidx.compose.ui.unit.sp
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
-fun PembukuanCard() {
+fun PembukuanCard(
+    judulBuku: String,
+    namaAgen: String,
+    jenisBuku: String,
+    date: String
+) {
     Column(
         modifier = Modifier
             .width(250.dp)
@@ -32,30 +37,31 @@ fun PembukuanCard() {
             .padding(10.dp)
     ) {
         Text(
-            text = "Barang Masuk",
+            text = jenisBuku,
             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 10.sp),
             textAlign = TextAlign.End,
             modifier = Modifier.fillMaxWidth()
         )
         Text(
-            text = "Manahan Sihombing",
+            text = namaAgen,
             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 10.sp)
         )
         Text(
-            text = "Cabai Merah",
+            text = judulBuku,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = "Kemarin",
+            text = date,
             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 10.sp)
         )
-        IconButton(onClick = {}, modifier = Modifier.align(Alignment.End)) {
-            Icon(
-                imageVector = Icons.Outlined.NavigateNext,
-                contentDescription = "Navigate to detail"
-            )
-        }
+        Icon(
+            imageVector = Icons.Outlined.NavigateNext,
+            contentDescription = "Navigate to detail",
+            modifier = Modifier
+                .align(Alignment.End)
+                .clickable { }
+        )
     }
 }
 
@@ -63,6 +69,6 @@ fun PembukuanCard() {
 @Composable
 fun PembukuanCardPrev() {
     BisnisPlusTheme {
-        PembukuanCard()
+        PembukuanCard("Cabai Merah", "Manahan Sihombing", "Barang Masuk", "Kemarin")
     }
 }

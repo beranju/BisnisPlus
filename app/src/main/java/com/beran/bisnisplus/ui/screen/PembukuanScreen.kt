@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.beran.bisnisplus.ui.component.CustomAppBar
 import com.beran.bisnisplus.ui.component.PembukuanCard
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
@@ -111,9 +110,9 @@ fun PembukuanScreen() {
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
-                PembukuanCard()
+                PembukuanCard("", "", "", "")
                 Spacer(modifier = Modifier.height(16.dp))
-                PembukuanCard()
+                PembukuanCard("", "", "", "")
             }
         }
     }

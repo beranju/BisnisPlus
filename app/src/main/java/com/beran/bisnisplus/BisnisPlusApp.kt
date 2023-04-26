@@ -29,7 +29,7 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
     Scaffold(
         topBar = {
             when (currentDestination) {
-                Screen.Home.route -> CustomAppBar(titleAppBar = "Home", true)
+                Screen.Home.route -> CustomAppBar(titleAppBar = "Bisnis Plus", true)
                 Screen.Pembukuan.route -> CustomAppBar(titleAppBar = "Pembukuan", true)
                 Screen.Statistik.route -> CustomAppBar(titleAppBar = "Statistik", true)
                 Screen.Pembayaran.route -> CustomAppBar(titleAppBar = "Pembayaran", true)
