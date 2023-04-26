@@ -72,7 +72,6 @@ fun PembukuanScreen() {
                 .padding(horizontal = 16.dp)
         ) {
             Column {
-                CustomAppBar(titleAppBar = "Pembukuan")
                 OutlinedTextField(
                     value = selectedText,
                     onValueChange = { newValue -> selectedText = newValue },

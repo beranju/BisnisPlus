@@ -6,15 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.beran.bisnisplus.ui.SetupNavGraph
-import com.beran.bisnisplus.ui.screen.HomeScreen
-import com.beran.bisnisplus.ui.screen.SplashScreen
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,7 +21,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    SetupNavGraph(navController = navController)
+                    BisnisPlusApp(navController = navController)
                 }
             }
         }
