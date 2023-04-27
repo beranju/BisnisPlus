@@ -14,8 +14,11 @@ import com.beran.bisnisplus.ui.component.CustomAppBar
 import com.beran.bisnisplus.ui.navigation.Screen
 import com.beran.bisnisplus.ui.screen.HomeScreen
 import com.beran.bisnisplus.ui.screen.OnBoardingScreen
+import com.beran.bisnisplus.ui.screen.PembayaranScreen
 import com.beran.bisnisplus.ui.screen.PembukuanScreen
+import com.beran.bisnisplus.ui.screen.SettingScreen
 import com.beran.bisnisplus.ui.screen.SplashScreen
+import com.beran.bisnisplus.ui.screen.StatistikScreen
 import com.beran.bisnisplus.ui.screen.auth.LogInScreen
 import com.beran.bisnisplus.ui.screen.auth.SetPhotoScreen
 import com.beran.bisnisplus.ui.screen.auth.SignDataBisnis
@@ -78,6 +81,15 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
             }
             composable(route = Screen.Pembukuan.route) {
                 PembukuanScreen()
+            }
+            composable(route = Screen.Statistik.route) {
+                StatistikScreen()
+            }
+            composable(route = Screen.Pembayaran.route) {
+                PembayaranScreen()
+            }
+            composable(route = Screen.Setting.route) {
+                SettingScreen()
             }
         }
     }
