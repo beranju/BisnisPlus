@@ -52,16 +52,14 @@ fun PembukuanScreen() {
             }
         }
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            Column {
-                CategoryBukuSection()
-                Text(text = "*Pilih kategori", style = MaterialTheme.typography.bodySmall)
-                PembukuanSection()
-            }
+            CategoryBukuSection()
+            Text(text = "*Pilih kategori", style = MaterialTheme.typography.bodySmall)
+            PembukuanSection()
         }
     }
 }
