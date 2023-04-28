@@ -38,12 +38,15 @@ import com.beran.bisnisplus.ui.component.CustomTextArea
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
-fun CreateNewPaymentScreen() {
-    CreateNewPaymentContent()
+fun CreateNewPaymentScreen(
+    onNavigateBack: () -> Unit
+) {
+    CreateNewPaymentContent(onNavigateBack = onNavigateBack)
 }
 
 @Composable
 private fun CreateNewPaymentContent(
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var entityName by remember {
@@ -62,7 +65,7 @@ private fun CreateNewPaymentContent(
     Scaffold(topBar = {
         CustomAppBar(
             titleAppBar = "Buat Tagihan",
-            onLeadingClick = { },
+            onLeadingClick = onNavigateBack,
             leadingIcon = Icons.Outlined.NavigateBefore
         )
     }) { innerPadding ->
@@ -168,6 +171,8 @@ private fun CategoryPaymentSection() {
 @Composable
 fun CreateNewPaymentScreenPrev() {
     BisnisPlusTheme {
-        CreateNewPaymentScreen()
+        CreateNewPaymentScreen(
+            onNavigateBack = {}
+        )
     }
 }

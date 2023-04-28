@@ -1,5 +1,6 @@
 package com.beran.bisnisplus
 
+import android.app.Application
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -23,8 +24,29 @@ import com.beran.bisnisplus.ui.screen.auth.LogInScreen
 import com.beran.bisnisplus.ui.screen.auth.SetPhotoScreen
 import com.beran.bisnisplus.ui.screen.auth.SignDataBisnis
 import com.beran.bisnisplus.ui.screen.auth.SignUpScreen
+import com.beran.bisnisplus.ui.screen.pembayaran.CreateNewPaymentScreen
 import com.beran.bisnisplus.ui.screen.pembukuan.CreateNewBookScreen
 import com.beran.bisnisplus.ui.screen.setting.EditProfileUserScreen
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.logger.AndroidLogger
+import org.koin.core.context.startKoin
+import timber.log.Timber
+
+class BisnisPlusApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        // ** timber
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
+        // ** koin
+        startKoin {
+            AndroidLogger()
+            androidContext(this@BisnisPlusApp)
+            modules(listOf())
+        }
+    }
+}
 
 @Composable
 fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifier) {
@@ -100,7 +122,11 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
                 StatistikScreen()
             }
             composable(route = Screen.Pembayaran.route) {
-                PembayaranScreen()
+                PembayaranScreen(
+                    onNavigateToCreateNewPayment = {
+                        navController.navigate(Screen.CreateNewPayment.route)
+                    }
+                )
             }
             composable(route = Screen.Setting.route) {
                 SettingScreen(onNavigateToEditProfile = {
@@ -112,6 +138,13 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
             }
             composable(route = Screen.CreateNewBook.route) {
                 CreateNewBookScreen(
+                    onNavigateBack = {
+                        navController.navigateUp()
+                    }
+                )
+            }
+            composable(route = Screen.CreateNewPayment.route) {
+                CreateNewPaymentScreen(
                     onNavigateBack = {
                         navController.navigateUp()
                     }
