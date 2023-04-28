@@ -34,6 +34,7 @@ import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
 fun SettingScreen(
+    onNavigateToEditProfile: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -42,7 +43,7 @@ fun SettingScreen(
             .padding(horizontal = 24.dp, vertical = 16.dp)
     )
     {
-        ProfileCard()
+        ProfileCard(onNavigateToEditProfile = onNavigateToEditProfile)
         Spacer(modifier = Modifier.height(50.dp))
         OptionMenu()
     }
@@ -81,7 +82,7 @@ private fun MenuItem(
 }
 
 @Composable
-private fun ProfileCard(modifier: Modifier = Modifier) {
+private fun ProfileCard(onNavigateToEditProfile: () -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -103,7 +104,10 @@ private fun ProfileCard(modifier: Modifier = Modifier) {
                 text = "Pedagang Cabai",
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp)
             )
-            Button(onClick = {}, modifier = Modifier.align(Alignment.End)) {
+            Button(
+                onClick = onNavigateToEditProfile,
+                modifier = Modifier.align(Alignment.End)
+            ) {
                 Text(text = "Edit")
             }
         }
@@ -115,6 +119,6 @@ private fun ProfileCard(modifier: Modifier = Modifier) {
 @Composable
 fun SettingScreenPrev() {
     BisnisPlusTheme {
-        SettingScreen()
+        SettingScreen(onNavigateToEditProfile = {})
     }
 }

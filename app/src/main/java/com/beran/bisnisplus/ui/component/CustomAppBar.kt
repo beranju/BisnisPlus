@@ -1,5 +1,6 @@
 package com.beran.bisnisplus.ui.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
@@ -23,6 +25,8 @@ import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 @Composable
 fun CustomAppBar(
     titleAppBar: String,
+    onLeadingClick: () -> Unit,
+    leadingIcon: ImageVector = Icons.Outlined.Menu,
     showTrailingIcon: Boolean = false
 ) {
     Row(
@@ -33,14 +37,17 @@ fun CustomAppBar(
             .height(85.dp)
             .padding(horizontal = 16.dp)
     ) {
-        Icon(imageVector = Icons.Outlined.Menu, contentDescription = "Menu")
+        Icon(imageVector = leadingIcon, contentDescription = "Menu", modifier = Modifier.clickable { onLeadingClick() })
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = titleAppBar,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.weight(1f)
         )
-        if (showTrailingIcon) Icon(imageVector = Icons.Outlined.AccountCircle, contentDescription = "Avatar icon")
+        if (showTrailingIcon) Icon(
+            imageVector = Icons.Outlined.AccountCircle,
+            contentDescription = "Avatar icon"
+        )
     }
 
 }
@@ -49,6 +56,6 @@ fun CustomAppBar(
 @Composable
 fun CustomAppBarPrev() {
     BisnisPlusTheme {
-        CustomAppBar("Bisnis Plus", true)
+        CustomAppBar(titleAppBar = "Bisnis Plus", onLeadingClick = {}, showTrailingIcon = true)
     }
 }

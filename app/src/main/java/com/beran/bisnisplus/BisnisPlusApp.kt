@@ -23,27 +23,38 @@ import com.beran.bisnisplus.ui.screen.auth.LogInScreen
 import com.beran.bisnisplus.ui.screen.auth.SetPhotoScreen
 import com.beran.bisnisplus.ui.screen.auth.SignDataBisnis
 import com.beran.bisnisplus.ui.screen.auth.SignUpScreen
+import com.beran.bisnisplus.ui.screen.setting.EditProfileUserScreen
 
 @Composable
 fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifier) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination?.route
 
-    Scaffold(
-        topBar = {
-            when (currentDestination) {
-                Screen.Home.route -> CustomAppBar(titleAppBar = "Bisnis Plus", true)
-                Screen.Pembukuan.route -> CustomAppBar(titleAppBar = "Pembukuan")
-                Screen.Statistik.route -> CustomAppBar(titleAppBar = "Statistik")
-                Screen.Pembayaran.route -> CustomAppBar(titleAppBar = "Pembayaran")
-                Screen.Setting.route -> CustomAppBar(titleAppBar = "Setting")
-            }
-        },
-        bottomBar = {
-            if (currentDestination == Screen.Home.route || currentDestination == Screen.Pembukuan.route || currentDestination == Screen.Statistik.route || currentDestination == Screen.Pembayaran.route || currentDestination == Screen.Setting.route) {
-                BottomBar(navController = navController)
-            }
-        }, modifier = modifier
+    Scaffold(topBar = {
+        when (currentDestination) {
+            Screen.Home.route -> CustomAppBar(titleAppBar = "Bisnis Plus",
+                showTrailingIcon = true,
+                onLeadingClick = {})
+
+            Screen.Pembukuan.route -> CustomAppBar(
+                titleAppBar = "Pembukuan",
+                onLeadingClick = {})
+
+            Screen.Statistik.route -> CustomAppBar(
+                titleAppBar = "Statistik",
+                onLeadingClick = {})
+
+            Screen.Pembayaran.route -> CustomAppBar(
+                titleAppBar = "Pembayaran",
+                onLeadingClick = {})
+
+            Screen.Setting.route -> CustomAppBar(titleAppBar = "Setting", onLeadingClick = {})
+        }
+    }, bottomBar = {
+        if (currentDestination == Screen.Home.route || currentDestination == Screen.Pembukuan.route || currentDestination == Screen.Statistik.route || currentDestination == Screen.Pembayaran.route || currentDestination == Screen.Setting.route) {
+            BottomBar(navController = navController)
+        }
+    }, modifier = modifier
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -89,7 +100,12 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
                 PembayaranScreen()
             }
             composable(route = Screen.Setting.route) {
-                SettingScreen()
+                SettingScreen(onNavigateToEditProfile = {
+                    navController.navigate(Screen.EditProfileUser.route)
+                })
+            }
+            composable(route = Screen.EditProfileUser.route) {
+                EditProfileUserScreen(onNavigateBack = { navController.navigateUp() })
             }
         }
     }
