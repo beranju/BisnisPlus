@@ -43,23 +43,28 @@ import com.beran.bisnisplus.ui.component.PembukuanCard
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
-fun PembukuanScreen() {
+fun PembukuanScreen(
+    onNavigateToCreateBook: () -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     Scaffold(
         floatingActionButton = {
-            Button(onClick = { }, shape = CircleShape) {
+            Button(onClick = onNavigateToCreateBook, shape = CircleShape) {
                 Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Buat pembukuan")
             }
         }
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-        ) {
-            CategoryBukuSection()
-            Text(text = "*Pilih kategori", style = MaterialTheme.typography.bodySmall)
-            PembukuanSection()
+    ) { innerPadding ->
+        Box(modifier = modifier.padding(innerPadding)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+            ) {
+                CategoryBukuSection()
+                Text(text = "*Pilih kategori", style = MaterialTheme.typography.bodySmall)
+                PembukuanSection()
+            }
         }
     }
 }
@@ -148,6 +153,6 @@ fun CategoryBukuSection() {
 @Composable
 fun PembukuanScreenPrev() {
     BisnisPlusTheme {
-        PembukuanScreen()
+        PembukuanScreen(onNavigateToCreateBook = {})
     }
 }

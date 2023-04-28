@@ -23,6 +23,7 @@ import com.beran.bisnisplus.ui.screen.auth.LogInScreen
 import com.beran.bisnisplus.ui.screen.auth.SetPhotoScreen
 import com.beran.bisnisplus.ui.screen.auth.SignDataBisnis
 import com.beran.bisnisplus.ui.screen.auth.SignUpScreen
+import com.beran.bisnisplus.ui.screen.pembukuan.CreateNewBookScreen
 import com.beran.bisnisplus.ui.screen.setting.EditProfileUserScreen
 
 @Composable
@@ -91,7 +92,9 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
                 }
             }
             composable(route = Screen.Pembukuan.route) {
-                PembukuanScreen()
+                PembukuanScreen(
+                    onNavigateToCreateBook = { navController.navigate(Screen.CreateNewBook.route) }
+                )
             }
             composable(route = Screen.Statistik.route) {
                 StatistikScreen()
@@ -106,6 +109,13 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
             }
             composable(route = Screen.EditProfileUser.route) {
                 EditProfileUserScreen(onNavigateBack = { navController.navigateUp() })
+            }
+            composable(route = Screen.CreateNewBook.route) {
+                CreateNewBookScreen(
+                    onNavigateBack = {
+                        navController.navigateUp()
+                    }
+                )
             }
         }
     }
