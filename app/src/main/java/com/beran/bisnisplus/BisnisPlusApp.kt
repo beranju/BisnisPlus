@@ -115,7 +115,10 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
             }
             composable(route = Screen.Pembukuan.route) {
                 PembukuanScreen(
-                    onNavigateToCreateBook = { navController.navigate(Screen.CreateNewBook.route) }
+                    onNavigateToCreateBook = { navController.navigate(Screen.CreateNewBook.route) },
+                    onNavigateToLaporanScreen = {route ->
+                        // ** on navigate to laporan screen
+                    }
                 )
             }
             composable(route = Screen.Statistik.route) {
