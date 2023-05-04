@@ -26,6 +26,7 @@ import com.beran.bisnisplus.ui.screen.auth.SignDataBisnis
 import com.beran.bisnisplus.ui.screen.auth.SignUpScreen
 import com.beran.bisnisplus.ui.screen.pembayaran.CreateNewPaymentScreen
 import com.beran.bisnisplus.ui.screen.pembukuan.CreateNewBookScreen
+import com.beran.bisnisplus.ui.screen.pembukuan.CreateNewRecordScreen
 import com.beran.bisnisplus.ui.screen.setting.EditProfileUserScreen
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.logger.AndroidLogger
@@ -115,7 +116,7 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
             }
             composable(route = Screen.Pembukuan.route) {
                 PembukuanScreen(
-                    onNavigateToCreateBook = { navController.navigate(Screen.CreateNewBook.route) },
+                    onNavigateToCreateBook = { navController.navigate(Screen.CreateNewRecord.route) },
                     onNavigateToLaporanScreen = {route ->
                         // ** on navigate to laporan screen
                     }
@@ -145,6 +146,9 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
                         navController.navigateUp()
                     }
                 )
+            }
+            composable(route = Screen.CreateNewRecord.route) {
+                CreateNewRecordScreen( )
             }
             composable(route = Screen.CreateNewPayment.route) {
                 CreateNewPaymentScreen(
