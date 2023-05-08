@@ -25,8 +25,8 @@ import com.beran.bisnisplus.ui.screen.auth.SetPhotoScreen
 import com.beran.bisnisplus.ui.screen.auth.SignDataBisnis
 import com.beran.bisnisplus.ui.screen.auth.SignUpScreen
 import com.beran.bisnisplus.ui.screen.pembayaran.CreateNewPaymentScreen
-import com.beran.bisnisplus.ui.screen.pembukuan.CreateNewBookScreen
 import com.beran.bisnisplus.ui.screen.pembukuan.CreateNewRecordScreen
+import com.beran.bisnisplus.ui.screen.pembukuan.component.FinancialStatementScreen
 import com.beran.bisnisplus.ui.screen.setting.EditProfileUserScreen
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.logger.AndroidLogger
@@ -117,8 +117,8 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
             composable(route = Screen.Pembukuan.route) {
                 PembukuanScreen(
                     onNavigateToCreateBook = { navController.navigate(Screen.CreateNewRecord.route) },
-                    onNavigateToLaporanScreen = {route ->
-                        // ** on navigate to laporan screen
+                    onNavigateToLaporanScreen = { route ->
+                        navController.navigate(route)
                     }
                 )
             }
@@ -140,15 +140,8 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
             composable(route = Screen.EditProfileUser.route) {
                 EditProfileUserScreen(onNavigateBack = { navController.navigateUp() })
             }
-            composable(route = Screen.CreateNewBook.route) {
-                CreateNewBookScreen(
-                    onNavigateBack = {
-                        navController.navigateUp()
-                    }
-                )
-            }
             composable(route = Screen.CreateNewRecord.route) {
-                CreateNewRecordScreen( )
+                CreateNewRecordScreen()
             }
             composable(route = Screen.CreateNewPayment.route) {
                 CreateNewPaymentScreen(
@@ -156,6 +149,11 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
                         navController.navigateUp()
                     }
                 )
+            }
+            composable(route = Screen.FinancialStatement.route) {
+                FinancialStatementScreen(onNavigateBack = {
+                    navController.navigateUp()
+                })
             }
         }
     }

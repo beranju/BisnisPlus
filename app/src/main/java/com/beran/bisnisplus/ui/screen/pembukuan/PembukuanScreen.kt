@@ -41,6 +41,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.beran.bisnisplus.ui.navigation.Screen
 import com.beran.bisnisplus.ui.screen.pembukuan.TabContentScreen
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import kotlinx.coroutines.launch
@@ -54,7 +55,7 @@ fun PembukuanScreen(
 ) {
     Scaffold(floatingActionButton = {
         Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-            Button(onClick = onNavigateToCreateBook, shape = CircleShape) {
+            Button(onClick = { onNavigateToLaporanScreen(Screen.FinancialStatement.route) }, shape = CircleShape) {
                 Icon(
                     imageVector = Icons.Default.IosShare,
                     contentDescription = "Melihat Laporan Keuangan"
@@ -157,7 +158,7 @@ private fun TipsCardSection(
 ) {
     val annotatedText = buildAnnotatedString {
         append("Anda dapat melihat laporan keuangan melalui tombol export dibawah atau tekan disini ")
-        pushStringAnnotation(tag = "route", annotation = "laporanKeuangan")
+        pushStringAnnotation(tag = Screen.FinancialStatement.route, annotation = "laporanKeuangan")
         withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onTertiaryContainer)) {
             append("Lihat laporan Keuangan")
         }
@@ -169,7 +170,11 @@ private fun TipsCardSection(
     ) {
         ClickableText(
             text = annotatedText, onClick = { offset ->
-                annotatedText.getStringAnnotations(tag = "route", start = offset, end = offset)
+                annotatedText.getStringAnnotations(
+                    tag = Screen.FinancialStatement.route,
+                    start = offset,
+                    end = offset
+                )
                     .firstOrNull()?.let { annotation ->
                         onNavigateToLaporanScreen(annotation.item)
                     }
