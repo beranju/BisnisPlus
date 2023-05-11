@@ -30,11 +30,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.beran.bisnisplus.R
+import com.beran.bisnisplus.ui.screen.setting.SettingViewModel
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingScreen(
+    viewModel: SettingViewModel,
     onNavigateToEditProfile: () -> Unit,
+    signOut: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -45,18 +49,20 @@ fun SettingScreen(
     {
         ProfileCard(onNavigateToEditProfile = onNavigateToEditProfile)
         Spacer(modifier = Modifier.height(50.dp))
-        OptionMenu()
+        OptionMenu(
+            signOut = signOut
+        )
     }
 }
 
 @Composable
-private fun OptionMenu(modifier: Modifier = Modifier) {
+private fun OptionMenu(signOut: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.fillMaxWidth()
     ) {
         MenuItem(title = "Setting", onClick = { })
-        MenuItem(title = "Log Out", onClick = { })
+        MenuItem(title = "Log Out", onClick = signOut)
     }
 }
 
@@ -119,6 +125,6 @@ private fun ProfileCard(onNavigateToEditProfile: () -> Unit, modifier: Modifier 
 @Composable
 fun SettingScreenPrev() {
     BisnisPlusTheme {
-        SettingScreen(onNavigateToEditProfile = {})
+        SettingScreen(viewModel = koinViewModel(), onNavigateToEditProfile = {}, signOut = {})
     }
 }

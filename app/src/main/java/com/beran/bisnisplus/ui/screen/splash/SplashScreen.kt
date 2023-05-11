@@ -30,33 +30,39 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.beran.bisnisplus.R
-import com.beran.bisnisplus.ui.navigation.Screen
+import com.beran.bisnisplus.ui.screen.splash.SplashViewModel
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavHostController) {
+fun SplashScreen(
+    viewModel: SplashViewModel,
+    onNavigateToHome: () -> Unit,
+    onNavigateToOnBoard: () -> Unit,
+) {
     var startAnimation by remember {
         mutableStateOf(false)
     }
     val alphaAnim = animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0f,
-        animationSpec = tween(durationMillis = 3_000)
+        animationSpec = tween(durationMillis = 2_000)
     )
 
     LaunchedEffect(key1 = true) {
         // ** start animation
         startAnimation = true
-        delay(4_000)
+        delay(1_000)
         /**
          * Go to home screen after delayed among 4000...
          * ...add popBackStack to avoid back to splash ...
          * ...when click navigate back
          */
-        navController.popBackStack()
-        navController.navigate(Screen.OnBoard.route)
+        if (viewModel.isLogin) {
+            onNavigateToHome()
+        } else {
+            onNavigateToOnBoard()
+        }
     }
     Splash(alpha = alphaAnim.value)
 }

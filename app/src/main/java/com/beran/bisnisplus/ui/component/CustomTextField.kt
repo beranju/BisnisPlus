@@ -24,10 +24,13 @@ fun CustomTextField(
     icon: ImageVector,
     value: String,
     onChangeValue: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    errorText: String? = null,
+    isError: Boolean = false,
     keyBoardType: KeyboardType = KeyboardType.Text,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(text = labelText, style = MaterialTheme.typography.labelMedium)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
@@ -49,6 +52,16 @@ fun CustomTextField(
             ),
             visualTransformation = visualTransformation,
             keyboardOptions = KeyboardOptions(keyboardType = keyBoardType),
+            isError = isError,
+            supportingText = {
+                if (isError) {
+                    Text(
+                        text = errorText.orEmpty(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         )
     }
 }

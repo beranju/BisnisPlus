@@ -60,7 +60,11 @@ fun OnBoardingScreen(navController: NavHostController) {
                             }
                         },
                         onSkip = {
-                            navController.navigate(Screen.SignUp.route)
+                            navController.navigate(Screen.SignUp.route) {
+                                popUpTo(Screen.SignUp.route) {
+                                    inclusive = true
+                                }
+                            }
                         }
                     )
 
@@ -71,11 +75,21 @@ fun OnBoardingScreen(navController: NavHostController) {
                             }
                         },
                         onSkip = {
-                            navController.navigate(Screen.SignUp.route)
+                            navController.navigate(Screen.SignUp.route) {
+                                popUpTo(Screen.SignUp.route) {
+                                    inclusive = true
+                                }
+                            }
                         }
                     )
 
-                    2 -> ThirdOnBoardingScreen(onNext = { navController.navigate(Screen.SignUp.route) })
+                    2 -> ThirdOnBoardingScreen(onNext = {
+                        navController.navigate(Screen.SignUp.route) {
+                            popUpTo(Screen.SignUp.route) {
+                                inclusive = true
+                            }
+                        }
+                    })
                 }
             }
         }
