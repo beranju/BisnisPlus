@@ -1,5 +1,8 @@
 package com.beran.bisnisplus.ui.screen.pembukuan
 
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,15 +37,17 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.beran.bisnisplus.data.PembukuanItem
-import com.beran.bisnisplus.data.dummyItem
+import com.beran.bisnisplus.ui.screen.pembukuan.component.BooksCard
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import com.beran.bisnisplus.utils.Utils
-import androidx.compose.foundation.layout.Box as Box1
+import com.beran.bisnisplus.utils.Utils.convertToDate
+import com.beran.core.domain.model.BookModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TabContentScreen(
-    title: String, modifier: Modifier = Modifier
+    listBook: List<Pair<Long?, List<BookModel>>>,
+    modifier: Modifier = Modifier
 ) {
     var size by remember {
         mutableStateOf(Size.Zero)
@@ -53,90 +58,67 @@ fun TabContentScreen(
         .onGloballyPositioned { coordinate ->
             size = coordinate.size.toSize()
         }) {
-        ListBookSection(size = size)
+        ListBookSection(size = size, listBook = listBook)
     }
 }
 
-@Composable
-private fun BooksCard(
-    book: PembukuanItem, modifier: Modifier = Modifier
-) {
-    val amount = Utils.rupiahFormatter(book.amount)
-
-    Column(modifier = modifier.padding(vertical = 8.dp)) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = book.mitraName, style = MaterialTheme.typography.bodyMedium)
-                Text(text = book.category, style = MaterialTheme.typography.bodySmall)
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = amount,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Icon(
-                    imageVector = Icons.Default.NavigateNext,
-                    contentDescription = "Navigate to detail"
-                )
-            }
-        }
-        Divider(Modifier.height(1.dp))
-    }
-}
-
-
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ListBookSection(
+    listBook: List<Pair<Long?, List<BookModel>>>,
     size: Size
 ) {
     val localDensity = LocalDensity.current
     LazyColumn(
         modifier = Modifier.height(with(localDensity) { size.height.toDp() })
     ) {
-        item {
-            DateSection(date = "Senin, 27 April 2023")
-        }
-        items(dummyItem, key = { item -> item.id }) { book ->
-            BooksCard(book = book)
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                Text(text = "Total", style = MaterialTheme.typography.labelMedium)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Rp15.000.000,00",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
+        listBook.forEach { (timeStamp, list) ->
+            val totalAmount = list.sumOf { it.amount }.toLong()
+            val totalAmountFormatted = Utils.rupiahFormatter(totalAmount)
+            stickyHeader { DateSection(timeStamp) }
+            items(list, key = { item -> item.bookId.orEmpty() }) { book ->
+                BooksCard(book = book)
+            }
+            item {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Total", style = MaterialTheme.typography.labelMedium)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = totalAmountFormatted,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun DateSection(
-    date: String, modifier: Modifier = Modifier
+    date: Long?, modifier: Modifier = Modifier
 ) {
-    Box1(
+    val dateString = if (date != null) convertToDate(date) else return
+    Box(
         modifier = modifier
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(vertical = 8.dp, horizontal = 16.dp)
     ) {
-        Text(text = date, style = MaterialTheme.typography.bodySmall)
+        Text(text = dateString, style = MaterialTheme.typography.bodySmall)
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun TabContentScreenPrev() {
     BisnisPlusTheme {
-        TabContentScreen(title = "Pemasukan")
+        TabContentScreen(emptyList())
     }
 }

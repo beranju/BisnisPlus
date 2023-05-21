@@ -5,9 +5,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +32,12 @@ fun CustomTextArea(
             onValueChange = onValueChange,
             minLines = maxlines,
             maxLines = maxlines,
-            shape = RoundedCornerShape(10.dp),
+            shape = RoundedCornerShape(10.dp), colors = TextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background
+            ),
             modifier = Modifier.fillMaxWidth()
         )
         Text(text = hintText, style = MaterialTheme.typography.bodySmall)

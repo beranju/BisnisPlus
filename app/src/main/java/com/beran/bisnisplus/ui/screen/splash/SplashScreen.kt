@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.beran.bisnisplus.R
 import com.beran.bisnisplus.ui.screen.splash.SplashViewModel
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
@@ -39,8 +40,11 @@ import kotlinx.coroutines.delay
 fun SplashScreen(
     viewModel: SplashViewModel,
     onNavigateToHome: () -> Unit,
+    onNavigateToLogin: () -> Unit,
     onNavigateToOnBoard: () -> Unit,
 ) {
+    val isFirst = viewModel.isFirst.collectAsStateWithLifecycle(initialValue = false).value
+
     var startAnimation by remember {
         mutableStateOf(false)
     }
@@ -58,11 +62,16 @@ fun SplashScreen(
          * ...add popBackStack to avoid back to splash ...
          * ...when click navigate back
          */
-        if (viewModel.isLogin) {
-            onNavigateToHome()
-        } else {
+        if (isFirst) {
             onNavigateToOnBoard()
+        } else {
+            if (viewModel.isLogin) {
+                onNavigateToHome()
+            } else {
+                onNavigateToLogin()
+            }
         }
+
     }
     Splash(alpha = alphaAnim.value)
 }

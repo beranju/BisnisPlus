@@ -43,7 +43,8 @@ fun IncomeCustomDropdown(
         Box {
             OutlinedTextField(value = selectedValue,
                 onValueChange = onChangeValue,
-                label = { Text(text = "Kategori") },
+                placeholder = { Text(text = "Kategori") },
+                readOnly = true,
                 trailingIcon = {
                     Icon(imageVector = if (isExpanded) Icons.Outlined.ArrowDropUp else Icons.Outlined.ArrowDropDown,
                         contentDescription = "open dropdown",

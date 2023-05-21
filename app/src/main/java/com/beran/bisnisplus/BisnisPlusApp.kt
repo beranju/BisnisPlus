@@ -2,28 +2,34 @@ package com.beran.bisnisplus
 
 import android.app.Activity.RESULT_OK
 import android.app.Application
+import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.beran.bisnisplus.di.authUseCaseModule
+import com.beran.bisnisplus.di.bisnisUseCaseModule
+import com.beran.bisnisplus.di.bookUseCaseModule
 import com.beran.bisnisplus.di.viewModelModule
 import com.beran.bisnisplus.ui.component.BottomBar
 import com.beran.bisnisplus.ui.component.CustomAppBar
 import com.beran.bisnisplus.ui.navigation.Screen
+import com.beran.bisnisplus.ui.screen.BooksScreen
 import com.beran.bisnisplus.ui.screen.HomeScreen
 import com.beran.bisnisplus.ui.screen.OnBoardingScreen
 import com.beran.bisnisplus.ui.screen.PembayaranScreen
-import com.beran.bisnisplus.ui.screen.PembukuanScreen
 import com.beran.bisnisplus.ui.screen.SettingScreen
 import com.beran.bisnisplus.ui.screen.SplashScreen
 import com.beran.bisnisplus.ui.screen.StatistikScreen
@@ -31,15 +37,20 @@ import com.beran.bisnisplus.ui.screen.auth.LogInScreen
 import com.beran.bisnisplus.ui.screen.auth.SetPhotoScreen
 import com.beran.bisnisplus.ui.screen.auth.SignDataBisnis
 import com.beran.bisnisplus.ui.screen.auth.SignUpScreen
+import com.beran.bisnisplus.ui.screen.auth.dataBisnis.BisnisViewModel
 import com.beran.bisnisplus.ui.screen.auth.signUp.SignUpViewModel
 import com.beran.bisnisplus.ui.screen.auth.signin.SignInViewModel
+import com.beran.bisnisplus.ui.screen.onboarding.OnBoardViewModel
 import com.beran.bisnisplus.ui.screen.pembayaran.CreateNewPaymentScreen
+import com.beran.bisnisplus.ui.screen.pembukuan.BookViewModel
 import com.beran.bisnisplus.ui.screen.pembukuan.CreateNewRecordScreen
 import com.beran.bisnisplus.ui.screen.pembukuan.component.FinancialStatementScreen
 import com.beran.bisnisplus.ui.screen.setting.EditProfileUserScreen
 import com.beran.bisnisplus.ui.screen.setting.SettingViewModel
 import com.beran.bisnisplus.ui.screen.splash.SplashViewModel
 import com.beran.core.di.authModule
+import com.beran.core.di.bisnisModule
+import com.beran.core.domain.model.BusinessModel
 import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.logger.AndroidLogger
@@ -63,12 +74,16 @@ class BisnisPlusApk : Application() {
                     authModule,
                     authUseCaseModule,
                     viewModelModule,
+                    bisnisModule,
+                    bisnisUseCaseModule,
+                    bookUseCaseModule,
                 )
             )
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifier) {
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -111,16 +126,20 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
                     viewModel = viewModel,
                     onNavigateToHome = {
                         navController.popBackStack()
-                        navController.navigate(Screen.Home.route){
-                            popUpTo(Screen.Home.route){
+                        navController.navigate(Screen.Home.route)
+                    },
+                    onNavigateToOnBoard = {
+                        navController.popBackStack()
+                        navController.navigate(Screen.OnBoard.route) {
+                            popUpTo(Screen.OnBoard.route) {
                                 inclusive = true
                             }
                         }
                     },
-                    onNavigateToOnBoard = {
+                    onNavigateToLogin = {
                         navController.popBackStack()
-                        navController.navigate(Screen.OnBoard.route){
-                            popUpTo(Screen.OnBoard.route){
+                        navController.navigate(Screen.SignIn.route) {
+                            popUpTo(Screen.SignIn.route) {
                                 inclusive = true
                             }
                         }
@@ -131,7 +150,8 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
                 HomeScreen()
             }
             composable(route = Screen.OnBoard.route) {
-                OnBoardingScreen(navController = navController)
+                val viewModel = koinViewModel<OnBoardViewModel>()
+                OnBoardingScreen(navController = navController, viewModel = viewModel)
             }
             composable(route = Screen.SignUp.route) {
                 val viewModel = koinViewModel<SignUpViewModel>()
@@ -175,9 +195,30 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
                 )
             }
             composable(route = Screen.SignDataBisnis.route) {
-                SignDataBisnis(onNavigateToSetPhoto = {
-                    navController.navigate(Screen.SetPhoto.route)
-                })
+                val viewModel = koinViewModel<BisnisViewModel>()
+                val currentUser = viewModel.currentUser
+                SignDataBisnis(
+                    viewmodel = viewModel, onNavigateToSignIn = {
+                        navController.popBackStack()
+                        navController.navigate(Screen.SignIn.route) {
+                            popUpTo(Screen.SignIn.route) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                    onCreateBisnisData = { bisnisName, bisnisCategory, commodity ->
+                        val userId = viewModel.currentUser?.uid
+                        val bisnisId = System.currentTimeMillis()
+                        val bisnis = BusinessModel(
+                            bisnisId = bisnisId.toString(),
+                            bisnisName = bisnisName,
+                            bisnisCategory = bisnisCategory,
+                            commodity = commodity,
+                            userId = userId
+                        )
+                        viewModel.createNewBisnis(bisnis)
+                    }
+                )
             }
             composable(route = Screen.SetPhoto.route) {
                 SetPhotoScreen(onNavigateToSignIn = {
@@ -210,13 +251,24 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
 
                 }, onNavigateToHome = {
                     navController.navigate(Screen.Home.route)
+                }, onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp.route)
                 })
             }
             composable(route = Screen.Pembukuan.route) {
-                PembukuanScreen(
+                val viewModel = koinViewModel<BookViewModel>()
+                val state = viewModel.listBook.collectAsStateWithLifecycle().value
+                BooksScreen(
+                    state = state,
                     onNavigateToCreateBook = { navController.navigate(Screen.CreateNewRecord.route) },
                     onNavigateToLaporanScreen = { route ->
                         navController.navigate(route)
+                    },
+                    fetchListBook = {
+                        viewModel.fetchBooks()
+                    },
+                    resetState = {
+                        viewModel.resetUiState
                     }
                 )
             }
@@ -240,11 +292,7 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
                     signOut = {
                         viewModel.signOut()
                         navController.popBackStack()
-                        navController.navigate(Screen.SignIn.route) {
-                            popUpTo(Screen.SignIn.route) {
-                                inclusive = true
-                            }
-                        }
+                        navController.navigate(Screen.SignIn.route)
                     }
                 )
             }
@@ -252,7 +300,16 @@ fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifie
                 EditProfileUserScreen(onNavigateBack = { navController.navigateUp() })
             }
             composable(route = Screen.CreateNewRecord.route) {
-                CreateNewRecordScreen()
+                val viewModel = koinViewModel<BookViewModel>()
+                CreateNewRecordScreen(
+                    viewModel = viewModel,
+                    onCreateNewBook = { bookModel ->
+                        viewModel.createNewBook(bookModel)
+                    },
+                    onNavigateBack = {
+                        navController.navigateUp()
+                    },
+                )
             }
             composable(route = Screen.CreateNewPayment.route) {
                 CreateNewPaymentScreen(

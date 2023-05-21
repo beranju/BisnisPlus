@@ -16,4 +16,6 @@ interface AuthUseCase {
     suspend fun getSignInIntent(): IntentSender?
     suspend fun logOut()
     fun currentUser(): UserModel?
+    fun showOnBoard(): Flow<Boolean>
+    suspend fun setShowOnBoard(isFirst: Boolean)
 }

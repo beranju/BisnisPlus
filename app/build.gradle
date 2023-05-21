@@ -81,4 +81,12 @@ dependencies {
     // ** navigation compose
     implementation "androidx.navigation:navigation-compose:2.5.3"
     implementation("androidx.compose.material:material:1.3.1")
+
+    // ** material dialog
+    implementation 'com.maxkeppeler.sheets-compose-dialogs:core:1.1.1'
+    implementation 'com.maxkeppeler.sheets-compose-dialogs:calendar:1.1.1'
+    implementation 'com.maxkeppeler.sheets-compose-dialogs:input:1.1.1'
+
+    // ** permission
+    implementation 'com.google.accompanist:accompanist-permissions:0.23.1'
 }

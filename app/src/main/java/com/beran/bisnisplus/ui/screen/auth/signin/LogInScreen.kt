@@ -50,6 +50,7 @@ import com.beran.bisnisplus.utils.Utils
 fun LogInScreen(
     viewModel: SignInViewModel,
     onNavigateToHome: () -> Unit,
+    onNavigateToSignUp: () -> Unit,
     oneTapSignIn: () -> Unit,
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
@@ -180,7 +181,7 @@ fun LogInScreen(
                             .align(Alignment.CenterEnd)
                     ) {
                         CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primaryContainer,
+                            color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier
                                 .size(25.dp)
                         )
@@ -197,9 +198,11 @@ fun LogInScreen(
             Image(
                 painter = painterResource(id = R.drawable.icon_google),
                 contentDescription = "Icon Google",
-                modifier = Modifier.size(45.dp).clickable {
-                    oneTapSignIn()
-                }
+                modifier = Modifier
+                    .size(45.dp)
+                    .clickable {
+                        oneTapSignIn()
+                    }
             )
             Spacer(modifier = Modifier.height(20.dp))
             Row(
@@ -211,7 +214,7 @@ fun LogInScreen(
                     text = stringResource(R.string.belum_punya_akun),
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp)
                 )
-                TextButton(onClick = {}) {
+                TextButton(onClick = onNavigateToSignUp) {
                     Text(
                         text = stringResource(id = R.string.txt_daftar),
                         style = MaterialTheme.typography.bodyMedium

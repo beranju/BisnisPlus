@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.toSize
 import com.beran.bisnisplus.constant.ExpenseCategory
-import com.beran.bisnisplus.constant.IncomeCategory
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
@@ -44,7 +43,8 @@ fun ExpensesCustomDropdown(
         Box {
             OutlinedTextField(value = selectedValue,
                 onValueChange = onChangeValue,
-                label = { Text(text = "Kategori") },
+                placeholder = { Text(text = "Kategori") },
+                readOnly = true,
                 trailingIcon = {
                     Icon(imageVector = if (isExpanded) Icons.Outlined.ArrowDropUp else Icons.Outlined.ArrowDropDown,
                         contentDescription = "open dropdown",

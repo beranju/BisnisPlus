@@ -112,7 +112,7 @@ private fun ListBookSection(
                 BookItem(
                     category = book.category,
                     date = book.date,
-                    amount = Utils.rupiahFormatter(book.amount),
+                    amount = Utils.rupiahFormatter(book.amount.toLong()),
                     type = book.bookType,
                     isIncome = book.bookType == BookTypes.Pemasukan.string
                 )

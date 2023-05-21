@@ -23,6 +23,8 @@ fun CustomUnderLineTextField(
     value: String,
     onChangeValue: (String) -> Unit,
     modifier: Modifier = Modifier,
+    readOnly: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text,
     leadingIcon: (@Composable() () -> Unit)? = null,
     trailingIcon: (@Composable() () -> Unit)? = null
 ) {
@@ -41,6 +43,7 @@ fun CustomUnderLineTextField(
                 value = value,
                 onValueChange = onChangeValue,
                 singleLine = true,
+                readOnly = readOnly,
                 leadingIcon = leadingIcon,
                 trailingIcon = trailingIcon,
                 colors = TextFieldDefaults.colors(
@@ -49,7 +52,7 @@ fun CustomUnderLineTextField(
                     focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     focusedIndicatorColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                 modifier = Modifier.weight(3f)
             )
         }

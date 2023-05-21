@@ -1,7 +1,13 @@
 package com.beran.core.data.repository
 
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.preferencesDataStore
 import com.beran.core.common.Constant
 import com.beran.core.common.Resource
 import com.beran.core.domain.model.UserModel
@@ -17,15 +23,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
+
+private val Context.onBoardSession: DataStore<Preferences> by preferencesDataStore(Constant.onBoard)
+
 class AuthRepository(
+    private val context: Context,
     private val auth: FirebaseAuth,
     private val fireStore: FirebaseFirestore,
     private var oneTapClient: SignInClient,
     private var signInRequest: BeginSignInRequest,
     private var signUpRequest: BeginSignInRequest,
 ) : IAuthRepository {
+
+    private val isFirstLaunch = booleanPreferencesKey(Constant.isFirst)
     override fun signUp(
         name: String,
         email: String,
@@ -70,7 +83,7 @@ class AuthRepository(
 
 
     override fun oneTapSignUp(intent: Intent): Flow<Resource<UserModel>> =
-        flow{
+        flow {
             emit(Resource.Loading)
             val credential = oneTapClient.getSignInCredentialFromIntent(intent)
             val googleIdToken = credential.googleIdToken
@@ -87,7 +100,7 @@ class AuthRepository(
                     emit(Resource.Success(data))
                     fireStore.collection(Constant.userRef).add(data).await()
                 }
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
                 emit(Resource.Error(e.message ?: "Something went wrong!"))
             }
@@ -121,7 +134,7 @@ class AuthRepository(
             oneTapClient.beginSignIn(
                 signUpRequest
             ).await()
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             if (e is CancellationException) throw e
             null
@@ -160,4 +173,16 @@ class AuthRepository(
             photoUrl = photoUrl.toString()
         )
     }
+
+    override fun showOnBoard(): Flow<Boolean> = context.onBoardSession.data.map {
+        it[isFirstLaunch] ?: true
+    }
+
+    override suspend fun setShowOnBoard(isFirst: Boolean) {
+        context.onBoardSession.edit { mutablePreferences ->
+            mutablePreferences[isFirstLaunch] = isFirst
+        }
+    }
+
+
 }

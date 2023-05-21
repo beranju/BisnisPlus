@@ -29,4 +29,9 @@ class AuthInteractor(private val repository: IAuthRepository) : AuthUseCase {
     override suspend fun logOut() = repository.logOut()
 
     override fun currentUser(): UserModel? = repository.currentUser()
+    override fun showOnBoard(): Flow<Boolean> = repository.showOnBoard()
+
+    override suspend fun setShowOnBoard(isFirst: Boolean) {
+        repository.setShowOnBoard(isFirst)
+    }
 }

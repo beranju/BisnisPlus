@@ -25,15 +25,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.beran.bisnisplus.ui.navigation.Screen
 import com.beran.bisnisplus.ui.screen.onboarding.FirstOnBoardingScreen
+import com.beran.bisnisplus.ui.screen.onboarding.OnBoardViewModel
 import com.beran.bisnisplus.ui.screen.onboarding.SecondOnBoardingScreen
 import com.beran.bisnisplus.ui.screen.onboarding.ThirdOnBoardingScreen
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun OnBoardingScreen(navController: NavHostController) {
+fun OnBoardingScreen(viewModel: OnBoardViewModel, navController: NavHostController) {
     /**
      * pager digunakan untuk membuat slider
      * reff => https://developer.android.com/jetpack/compose/layouts/pager
@@ -60,6 +62,7 @@ fun OnBoardingScreen(navController: NavHostController) {
                             }
                         },
                         onSkip = {
+                            viewModel.setOnBoardState(false)
                             navController.navigate(Screen.SignUp.route) {
                                 popUpTo(Screen.SignUp.route) {
                                     inclusive = true
@@ -75,6 +78,7 @@ fun OnBoardingScreen(navController: NavHostController) {
                             }
                         },
                         onSkip = {
+                            viewModel.setOnBoardState(false)
                             navController.navigate(Screen.SignUp.route) {
                                 popUpTo(Screen.SignUp.route) {
                                     inclusive = true
@@ -84,6 +88,7 @@ fun OnBoardingScreen(navController: NavHostController) {
                     )
 
                     2 -> ThirdOnBoardingScreen(onNext = {
+                        viewModel.setOnBoardState(false)
                         navController.navigate(Screen.SignUp.route) {
                             popUpTo(Screen.SignUp.route) {
                                 inclusive = true
@@ -119,6 +124,6 @@ fun OnBoardingScreen(navController: NavHostController) {
 @Composable
 fun OnBoardingScreenPrev() {
     BisnisPlusTheme {
-        OnBoardingScreen(navController = rememberNavController())
+        OnBoardingScreen(viewModel = koinViewModel(), navController = rememberNavController())
     }
 }
