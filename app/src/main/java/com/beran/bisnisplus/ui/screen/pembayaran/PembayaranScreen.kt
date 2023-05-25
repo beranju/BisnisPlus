@@ -44,11 +44,15 @@ import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
 fun PembayaranScreen(
+    onNavigateToCreateNewPayment: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         floatingActionButton = {
-            Button(onClick = { }, shape = CircleShape) {
+            Button(
+                onClick = onNavigateToCreateNewPayment,
+                shape = CircleShape
+            ) {
                 Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Buat Pembayaran")
             }
         },
@@ -145,6 +149,6 @@ private fun CategoryPembayaranSection() {
 @Composable
 fun PembayaranScreenPrev() {
     BisnisPlusTheme {
-        PembayaranScreen()
+        PembayaranScreen(onNavigateToCreateNewPayment = {})
     }
 }

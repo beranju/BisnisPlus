@@ -7,12 +7,6 @@ sealed class Screen(val route: String) {
     object SignDataBisnis : Screen("signDataBisnis")
     object SetPhoto : Screen("setPhoto")
     object SignIn : Screen("signIn")
-    object Home : Screen(route = "home")
-    object Pembukuan : Screen(route = "pembukuan")
-    object CreateNewBook : Screen(route = "createNewBook")
-    object Statistik : Screen("statistik")
-    object Pembayaran : Screen("pembayaran")
-    object Setting : Screen("setting")
-    object EditProfileUser : Screen("editProfileUser")
+    object Main : Screen("main")
 
 }

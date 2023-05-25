@@ -1,6 +1,8 @@
 package com.beran.bisnisplus.ui.screen.auth
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,10 +18,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,17 +39,51 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.beran.bisnisplus.R
 import com.beran.bisnisplus.ui.component.CustomTextField
+import com.beran.bisnisplus.ui.screen.auth.signin.SignInState
+import com.beran.bisnisplus.ui.screen.auth.signin.SignInViewModel
+import com.beran.bisnisplus.utils.Utils
+import com.beran.bisnisplus.utils.isValidEmail
 
 @Composable
-fun LogInScreen(onNavigateToHome: () -> Unit) {
+fun LogInScreen(
+    viewModel: SignInViewModel,
+    onNavigateToHome: () -> Unit,
+    onNavigateToSignUp: () -> Unit,
+    oneTapSignIn: () -> Unit,
+) {
+    val state = viewModel.uiState.collectAsStateWithLifecycle()
+
     var email by remember {
         mutableStateOf("")
+    }
+    var emailError by remember {
+        mutableStateOf<String?>(null)
     }
     var password by remember {
         mutableStateOf("")
     }
+    var passwordError by remember {
+        mutableStateOf<String?>(null)
+    }
+    var errorText by remember {
+        mutableStateOf<String?>(null)
+    }
+    var loading by remember {
+        mutableStateOf(false)
+    }
+
+    DisposableEffect(key1 = state.value, effect = {
+        when (state.value) {
+            is SignInState.Loading -> loading = true
+            is SignInState.Error -> errorText = (state.value as SignInState.Error).message
+            is SignInState.Success -> onNavigateToHome()
+            is SignInState.Initial -> {}
+        }
+        onDispose { }
+    })
 
     Box(
         modifier = Modifier
@@ -71,13 +109,36 @@ fun LogInScreen(onNavigateToHome: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(30.dp))
+
+            // ** shown this part when error is not empty
+            if (errorText != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.errorContainer)
+                        .padding(vertical = 4.dp, horizontal = 6.dp)
+                ) {
+                    Text(
+                        text = errorText.orEmpty(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+            }
             CustomTextField(
                 labelText = stringResource(id = R.string.txt_email),
                 hintText = stringResource(id = R.string.txt_email_hint),
                 icon = Icons.Outlined.Mail,
                 value = email,
-                onChangeValue = { newValue -> email = newValue },
-                keyBoardType = KeyboardType.Email
+                onChangeValue = { newValue ->
+                    email = newValue
+                    emailError = if (!newValue.isValidEmail()) "Email tidak valid" else null
+                },
+                keyBoardType = KeyboardType.Email,
+                errorText = emailError.orEmpty(),
+                isError = !emailError.isNullOrEmpty()
             )
             Spacer(modifier = Modifier.height(20.dp))
             CustomTextField(
@@ -85,21 +146,48 @@ fun LogInScreen(onNavigateToHome: () -> Unit) {
                 hintText = stringResource(id = R.string.txt_password_hint),
                 icon = Icons.Outlined.Lock,
                 value = password,
-                onChangeValue = { newValue -> password = newValue },
+                onChangeValue = { newValue ->
+                    password = newValue
+                    passwordError = if (newValue.length < 8) "Password minimal 8 karakter" else null
+                },
                 visualTransformation = PasswordVisualTransformation(),
-                keyBoardType = KeyboardType.Password
+                keyBoardType = KeyboardType.Password,
+                errorText = passwordError.orEmpty(),
+                isError = !passwordError.isNullOrEmpty()
             )
             Spacer(modifier = Modifier.height(25.dp))
-            Button(
-                onClick = onNavigateToHome,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-            ) {
-                Text(
-                    text = stringResource(id = R.string.txt_login),
-                    style = MaterialTheme.typography.bodyMedium
-                )
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = {
+                        if (email.isNotEmpty() && password.isNotEmpty() && emailError.isNullOrEmpty() && passwordError.isNullOrEmpty()) {
+                            viewModel.signIn(email, password)
+                        } else {
+                            errorText = "Field tidak boleh ada yang kosong"
+                        }
+                    }, enabled = !loading,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.txt_login),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                if (loading) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .size(25.dp)
+                        )
+                    }
+                }
             }
             Spacer(modifier = Modifier.height(30.dp))
             Text(
@@ -111,7 +199,11 @@ fun LogInScreen(onNavigateToHome: () -> Unit) {
             Image(
                 painter = painterResource(id = R.drawable.icon_google),
                 contentDescription = "Icon Google",
-                modifier = Modifier.size(45.dp)
+                modifier = Modifier
+                    .size(45.dp)
+                    .clickable {
+                        oneTapSignIn()
+                    }
             )
             Spacer(modifier = Modifier.height(20.dp))
             Row(
@@ -123,9 +215,9 @@ fun LogInScreen(onNavigateToHome: () -> Unit) {
                     text = stringResource(R.string.belum_punya_akun),
                     style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp)
                 )
-                TextButton(onClick = {}) {
+                TextButton(onClick = onNavigateToSignUp) {
                     Text(
-                        text = stringResource(id = R.string.txt_login),
+                        text = stringResource(id = R.string.txt_daftar),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
