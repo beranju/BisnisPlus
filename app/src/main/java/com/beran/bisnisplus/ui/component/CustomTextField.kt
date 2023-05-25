@@ -21,13 +21,17 @@ import androidx.compose.ui.unit.dp
 fun CustomTextField(
     labelText: String,
     hintText: String,
-    icon: ImageVector,
     value: String,
     onChangeValue: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    trailingIcon: ImageVector? = null,
+    errorText: String? = null,
+    isError: Boolean = false,
     keyBoardType: KeyboardType = KeyboardType.Text,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(text = labelText, style = MaterialTheme.typography.labelMedium)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
@@ -38,9 +42,16 @@ fun CustomTextField(
             placeholder = {
                 Text(text = hintText, style = MaterialTheme.typography.bodyMedium)
             },
-            leadingIcon = {
-                Icon(imageVector = icon, contentDescription = null)
-            },
+            leadingIcon = if (icon != null) {
+                {
+                    Icon(imageVector = icon, contentDescription = null)
+                }
+            } else null,
+            trailingIcon = if (trailingIcon != null) {
+                {
+                    Icon(imageVector = trailingIcon, contentDescription = null)
+                }
+            } else null,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.outline,
@@ -49,6 +60,16 @@ fun CustomTextField(
             ),
             visualTransformation = visualTransformation,
             keyboardOptions = KeyboardOptions(keyboardType = keyBoardType),
+            isError = isError,
+            supportingText = {
+                if (isError) {
+                    Text(
+                        text = errorText.orEmpty(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
         )
     }
 }

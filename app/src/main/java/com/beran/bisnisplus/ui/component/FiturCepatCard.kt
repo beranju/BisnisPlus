@@ -1,6 +1,7 @@
 package com.beran.bisnisplus.ui.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
 fun FiturCepatCard(
+    onNavigateToCreateBook: () -> Unit,
     title: String,
     icon: ImageVector
 ) {
@@ -36,6 +38,9 @@ fun FiturCepatCard(
             .height(60.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.tertiaryContainer)
+            .clickable {
+                onNavigateToCreateBook()
+            }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -59,6 +64,6 @@ fun FiturCepatCard(
 @Composable
 fun FiturCepatCardPrev() {
     BisnisPlusTheme {
-        FiturCepatCard("Buat Buku", Icons.Outlined.StickyNote2)
+        FiturCepatCard(onNavigateToCreateBook = {},"Buat Buku", Icons.Outlined.StickyNote2)
     }
 }
