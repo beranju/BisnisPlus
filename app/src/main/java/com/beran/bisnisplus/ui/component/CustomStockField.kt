@@ -23,6 +23,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import com.beran.bisnisplus.constant.UnitName
+import com.beran.bisnisplus.ui.screen.pembukuan.component.StockCard
 import com.beran.bisnisplus.ui.screen.pembukuan.component.VerticalCustomDropDown
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import com.beran.bisnisplus.utils.Utils
@@ -162,7 +164,7 @@ fun CustomStockField(
             var dialogErrorText by remember {
                 mutableStateOf<String?>(null)
             }
-            Box {
+            Surface(shape = RoundedCornerShape(10.dp), color = MaterialTheme.colorScheme.background) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Column {
                         Text(
@@ -268,47 +270,6 @@ fun CustomStockField(
             }
         }
     }
-}
-
-
-@Composable
-private fun StockCard(
-    stockName: String,
-    stockUnitName: String?,
-    stockUnitPrice: Long,
-    modifier: Modifier = Modifier,
-    stockQuantityText: Double = 0.0
-) {
-    Box(
-        modifier = modifier
-            .padding(top = 8.dp)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.secondaryContainer)
-                .padding(horizontal = 10.dp, vertical = 4.dp)
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stockName,
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Text(
-                    text = "$stockQuantityText $stockUnitName",
-                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp)
-                )
-            }
-            Text(
-                text = "X ${Utils.rupiahFormatter(stockUnitPrice)}",
-                style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp)
-            )
-        }
-    }
-
 }
 
 @Preview(showBackground = true)

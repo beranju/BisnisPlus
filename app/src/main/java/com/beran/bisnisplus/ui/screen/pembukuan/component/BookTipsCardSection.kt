@@ -12,6 +12,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.beran.bisnisplus.ui.navigation.MainScreen
 import com.beran.bisnisplus.ui.navigation.Screen
 
 @Composable
@@ -20,7 +21,7 @@ fun BookTipsCardSection(
 ) {
     val annotatedText = buildAnnotatedString {
         append("Anda dapat melihat laporan keuangan melalui tombol export dibawah atau tekan disini ")
-        pushStringAnnotation(tag = Screen.FinancialStatement.route, annotation = "laporanKeuangan")
+        pushStringAnnotation(tag = MainScreen.FinancialStatement.route, annotation = "laporanKeuangan")
         withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onTertiaryContainer)) {
             append("Lihat laporan Keuangan")
         }
@@ -33,7 +34,7 @@ fun BookTipsCardSection(
         ClickableText(
             text = annotatedText, onClick = { offset ->
                 annotatedText.getStringAnnotations(
-                    tag = Screen.FinancialStatement.route,
+                    tag = MainScreen.FinancialStatement.route,
                     start = offset,
                     end = offset
                 )

@@ -1,11 +1,17 @@
 package com.beran.bisnisplus.utils
 
 import android.content.ContentResolver
+import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.os.ParcelFileDescriptor
 import android.provider.ContactsContract
 import androidx.annotation.RequiresApi
 import com.beran.core.domain.model.Contact
+import java.io.File
+import java.io.FileDescriptor
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.time.Instant
@@ -20,15 +26,7 @@ object Utils {
 
     fun rupiahFormatter(amount: Long): String {
         val formatter = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
-        return formatter.format(amount.toLong())
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun LocalDate.toEpochMilli(): Long {
-        val zoneId = ZoneId.systemDefault()
-        val zoneLocalDate = this.atStartOfDay(zoneId)
-        val instantDate = zoneLocalDate.toInstant()
-        return instantDate.toEpochMilli()
+        return formatter.format(amount)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -40,16 +38,6 @@ object Utils {
         val dayOfMonth = localDate.dayOfMonth
         val year = localDate.year
         return "$dayOfWeekName, $dayOfMonth $monthName $year"
-    }
-
-    /**
-     * this utils used to validate email input...
-     * ...use the regular expression pattern...
-     * ...that matches the valid email
-     */
-    fun isValidEmail(input: String): Boolean {
-        val emailRegex = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")
-        return emailRegex.matches(input)
     }
 
     fun getContacts(contactUri: Uri?, contentResolver: ContentResolver): Contact? {
@@ -67,4 +55,21 @@ object Utils {
 
         return null
     }
+
+    fun getFileFromUri(context: Context, uri: Uri): String? {
+        val contentResolver = context.contentResolver
+        val parcelFileDescriptor : ParcelFileDescriptor? = contentResolver.openFileDescriptor(uri, "r")
+        val fileDescriptor = parcelFileDescriptor?.fileDescriptor
+
+        val file = File(context.cacheDir, "temp.file")
+        val inputStream = FileInputStream(fileDescriptor)
+        val outputStream = FileOutputStream(file)
+        inputStream.copyTo(outputStream)
+
+        parcelFileDescriptor?.close()
+        inputStream.close()
+        outputStream.close()
+        return file.path
+    }
+
 }

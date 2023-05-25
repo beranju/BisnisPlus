@@ -1,5 +1,7 @@
 package com.beran.bisnisplus.ui.screen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,13 +31,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.beran.bisnisplus.data.listDummyBuku
+import com.beran.bisnisplus.ui.component.ErrorView
 import com.beran.bisnisplus.ui.component.FiturCepatCard
 import com.beran.bisnisplus.ui.component.PembukuanCard
 import com.beran.bisnisplus.ui.component.ProgressCard
+import com.beran.bisnisplus.ui.screen.home.common.HomeState
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
+import com.beran.core.domain.model.BookModel
+import com.beran.core.utils.Utils
+import timber.log.Timber
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
+fun HomeScreen(
+    bookState: HomeState<List<BookModel>>,
+    onNavigateToCreateBook: () -> Unit,
+    fetchAllBooks: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -45,15 +58,28 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
         HomeMainCard()
-        FiturCepatSection()
-        PembukuanSection()
-        PembukuanSection()
+        FiturCepatSection(onNavigateToCreateBook = onNavigateToCreateBook)
+        when(bookState){
+            is HomeState.Loading -> fetchAllBooks()
+            is HomeState.Success -> {
+                Timber.tag("HomeScreen").i("${bookState.data}")
+                PembukuanSection(
+                    listBook = bookState.data
+                )
+            }
+            is HomeState.Error -> ErrorView(errorText = bookState.message)
+        }
+        PembukuanSection(emptyList())
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun PembukuanSection() {
-    Column {
+private fun PembukuanSection(
+    listBook: List<BookModel>,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Pembukuan",
@@ -61,12 +87,12 @@ private fun PembukuanSection() {
         )
         Spacer(modifier = Modifier.height(8.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(listDummyBuku) { item ->
+            items(listBook, key = {it.bookId.orEmpty()}) { item ->
                 PembukuanCard(
-                    judulBuku = item.judulBuku,
-                    namaAgen = item.agen,
-                    jenisBuku = item.kategori,
-                    date = item.date
+                    judulBuku = item.category.orEmpty(),
+                    namaAgen = item.mitra.orEmpty(),
+                    jenisBuku = item.type.orEmpty(),
+                    date = Utils.convertToDate(item.createdAt?: 0)
                 )
             }
         }
@@ -74,8 +100,11 @@ private fun PembukuanSection() {
 }
 
 @Composable
-fun FiturCepatSection() {
-    Column {
+fun FiturCepatSection(
+    onNavigateToCreateBook: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Fitur Cepat",
@@ -86,9 +115,21 @@ fun FiturCepatSection() {
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            FiturCepatCard(title = "Buat Buku", icon = Icons.Outlined.StickyNote2)
-            FiturCepatCard(title = "lihat Report", icon = Icons.Outlined.InsertChart)
-            FiturCepatCard(title = "Buat Tagihan", icon = Icons.Outlined.CreditCard)
+            FiturCepatCard(
+                title = "Buat Buku",
+                icon = Icons.Outlined.StickyNote2,
+                onNavigateToCreateBook = onNavigateToCreateBook
+            )
+            FiturCepatCard(
+                title = "lihat Report",
+                icon = Icons.Outlined.InsertChart,
+                onNavigateToCreateBook = onNavigateToCreateBook
+            )
+            FiturCepatCard(
+                title = "Buat Tagihan",
+                icon = Icons.Outlined.CreditCard,
+                onNavigateToCreateBook = onNavigateToCreateBook
+            )
         }
     }
 }
@@ -127,10 +168,15 @@ fun HomeMainCard() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPrev() {
     BisnisPlusTheme {
-        HomeScreen()
+        HomeScreen(
+            onNavigateToCreateBook = {},
+            fetchAllBooks = {},
+            bookState = HomeState.Loading
+        )
     }
 }

@@ -37,13 +37,13 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SignDataBisnis(
     viewmodel: BisnisViewModel,
-    onNavigateToSignIn: () -> Unit,
+    onNavigateToHome: () -> Unit,
     onCreateBisnisData: (bisnisName: String, bisnisCategory: String, commodity: String) -> Unit
 ) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle().value
     SignDataBisnisContent(
         state = state,
-        onNavigateToSignIn = onNavigateToSignIn,
+        onNavigateToHome = onNavigateToHome,
         onCreateBisnisData = onCreateBisnisData
     )
 }
@@ -51,7 +51,7 @@ fun SignDataBisnis(
 @Composable
 fun SignDataBisnisContent(
     state: BisnisState,
-    onNavigateToSignIn: () -> Unit,
+    onNavigateToHome: () -> Unit,
     onCreateBisnisData: (bisnisName: String, bisnisCategory: String, commodity: String) -> Unit
 ) {
     var bisnisName by remember {
@@ -74,7 +74,7 @@ fun SignDataBisnisContent(
         when (state) {
             is BisnisState.Loading -> isLoading = true
             is BisnisState.Error -> errorText = state.message
-            is BisnisState.Success -> onNavigateToSignIn()
+            is BisnisState.Success -> onNavigateToHome()
             else -> {}
         }
         onDispose {
@@ -183,6 +183,6 @@ fun SignDataBisnisPrev() {
         SignDataBisnis(
             viewmodel = koinViewModel(),
             onCreateBisnisData = { _, _, _ -> },
-            onNavigateToSignIn = {})
+            onNavigateToHome = {})
     }
 }

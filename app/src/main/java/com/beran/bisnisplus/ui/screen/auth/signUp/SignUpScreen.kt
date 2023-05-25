@@ -51,6 +51,7 @@ import com.beran.bisnisplus.ui.screen.auth.signUp.SignUpState
 import com.beran.bisnisplus.ui.screen.auth.signUp.SignUpViewModel
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import com.beran.bisnisplus.utils.Utils
+import com.beran.bisnisplus.utils.isValidEmail
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -61,7 +62,7 @@ import timber.log.Timber
 fun SignUpScreen(
     viewModel: SignUpViewModel,
     oneTapLogin : () -> Unit,
-    navigateToSignDataBisnis: (name: String, email: String, password: String) -> Unit,
+    navigateToSignDataBisnis: () -> Unit,
     navigateToSignIn: () -> Unit
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle()
@@ -90,9 +91,7 @@ fun SignUpScreen(
 
     DisposableEffect(key1 = state.value, effect = {
         when (state.value) {
-            is SignUpState.Success -> navigateToSignDataBisnis(
-                name, email, password
-            )
+            is SignUpState.Success -> navigateToSignDataBisnis()
             is SignUpState.Loading -> isLoading = true
             is SignUpState.Error -> {
                 errorText = "Ada yang salah, coba lagi!"
@@ -163,7 +162,7 @@ fun SignUpScreen(
                 onChangeValue = { newValue ->
                     email = newValue
                     // ** validation of email
-                    emailError = if (!Utils.isValidEmail(newValue)) "Email tidak valid" else null
+                    emailError = if (!newValue.isValidEmail()) "Email tidak valid" else null
                 },
                 keyBoardType = KeyboardType.Email,
                 errorText = emailError.orEmpty(),
@@ -259,7 +258,7 @@ fun SignUpScreenPrev() {
     BisnisPlusTheme {
         SignUpScreen(
             viewModel = koinViewModel(),
-            navigateToSignDataBisnis = {_, _, _  ->  }, navigateToSignIn = {}, oneTapLogin = {})
+            navigateToSignDataBisnis = {}, navigateToSignIn = {}, oneTapLogin = {})
     }
 
 }

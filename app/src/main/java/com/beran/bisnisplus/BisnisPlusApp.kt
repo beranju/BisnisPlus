@@ -2,7 +2,6 @@ package com.beran.bisnisplus
 
 import android.app.Activity.RESULT_OK
 import android.app.Application
-import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -16,12 +15,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import com.beran.bisnisplus.di.authUseCaseModule
 import com.beran.bisnisplus.di.bisnisUseCaseModule
 import com.beran.bisnisplus.di.bookUseCaseModule
+import com.beran.bisnisplus.di.bookViewModelModule
 import com.beran.bisnisplus.di.viewModelModule
 import com.beran.bisnisplus.ui.component.BottomBar
 import com.beran.bisnisplus.ui.component.CustomAppBar
@@ -40,11 +42,16 @@ import com.beran.bisnisplus.ui.screen.auth.SignUpScreen
 import com.beran.bisnisplus.ui.screen.auth.dataBisnis.BisnisViewModel
 import com.beran.bisnisplus.ui.screen.auth.signUp.SignUpViewModel
 import com.beran.bisnisplus.ui.screen.auth.signin.SignInViewModel
+import com.beran.bisnisplus.ui.screen.home.common.HomeViewModel
 import com.beran.bisnisplus.ui.screen.onboarding.OnBoardViewModel
 import com.beran.bisnisplus.ui.screen.pembayaran.CreateNewPaymentScreen
 import com.beran.bisnisplus.ui.screen.pembukuan.BookViewModel
 import com.beran.bisnisplus.ui.screen.pembukuan.CreateNewRecordScreen
+import com.beran.bisnisplus.ui.screen.pembukuan.EditBookRecordScreen
 import com.beran.bisnisplus.ui.screen.pembukuan.component.FinancialStatementScreen
+import com.beran.bisnisplus.ui.screen.pembukuan.create.CreateBookViewModel
+import com.beran.bisnisplus.ui.screen.pembukuan.edit.EditBookViewModel
+import com.beran.bisnisplus.ui.screen.pembukuan.report.FinancialReportViewModel
 import com.beran.bisnisplus.ui.screen.setting.EditProfileUserScreen
 import com.beran.bisnisplus.ui.screen.setting.SettingViewModel
 import com.beran.bisnisplus.ui.screen.splash.SplashViewModel
@@ -58,7 +65,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.context.startKoin
 import timber.log.Timber
 
-class BisnisPlusApk : Application() {
+class BisnisPlusApp : Application() {
     override fun onCreate() {
         super.onCreate()
         // ** timber
@@ -68,7 +75,7 @@ class BisnisPlusApk : Application() {
         // ** koin
         startKoin {
             AndroidLogger()
-            androidContext(this@BisnisPlusApk)
+            androidContext(this@BisnisPlusApp)
             modules(
                 listOf(
                     authModule,
@@ -77,252 +84,9 @@ class BisnisPlusApk : Application() {
                     bisnisModule,
                     bisnisUseCaseModule,
                     bookUseCaseModule,
+                    bookViewModelModule,
                 )
             )
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun BisnisPlusApp(navController: NavHostController, modifier: Modifier = Modifier) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = backStackEntry?.destination?.route
-
-    Scaffold(topBar = {
-        when (currentDestination) {
-            Screen.Home.route -> CustomAppBar(titleAppBar = "Bisnis Plus",
-                showTrailingIcon = true,
-                onLeadingClick = {})
-
-            Screen.Pembukuan.route -> CustomAppBar(
-                titleAppBar = "Pembukuan",
-                onLeadingClick = {})
-
-            Screen.Statistik.route -> CustomAppBar(
-                titleAppBar = "Statistik",
-                onLeadingClick = {})
-
-            Screen.Pembayaran.route -> CustomAppBar(
-                titleAppBar = "Pembayaran",
-                onLeadingClick = {})
-
-            Screen.Setting.route -> CustomAppBar(titleAppBar = "Setting", onLeadingClick = {})
-        }
-    }, bottomBar = {
-        if (currentDestination == Screen.Home.route || currentDestination == Screen.Pembukuan.route || currentDestination == Screen.Statistik.route || currentDestination == Screen.Pembayaran.route || currentDestination == Screen.Setting.route) {
-            BottomBar(navController = navController)
-        }
-    }, modifier = modifier
-    ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Splash.route,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(route = Screen.Splash.route) {
-                val viewModel = koinViewModel<SplashViewModel>()
-                SplashScreen(
-                    viewModel = viewModel,
-                    onNavigateToHome = {
-                        navController.popBackStack()
-                        navController.navigate(Screen.Home.route)
-                    },
-                    onNavigateToOnBoard = {
-                        navController.popBackStack()
-                        navController.navigate(Screen.OnBoard.route) {
-                            popUpTo(Screen.OnBoard.route) {
-                                inclusive = true
-                            }
-                        }
-                    },
-                    onNavigateToLogin = {
-                        navController.popBackStack()
-                        navController.navigate(Screen.SignIn.route) {
-                            popUpTo(Screen.SignIn.route) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                )
-            }
-            composable(route = Screen.Home.route) {
-                HomeScreen()
-            }
-            composable(route = Screen.OnBoard.route) {
-                val viewModel = koinViewModel<OnBoardViewModel>()
-                OnBoardingScreen(navController = navController, viewModel = viewModel)
-            }
-            composable(route = Screen.SignUp.route) {
-                val viewModel = koinViewModel<SignUpViewModel>()
-                val scope = rememberCoroutineScope()
-                val launcher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.StartIntentSenderForResult(),
-                    onResult = { result ->
-                        scope.launch {
-                            if (result.resultCode == RESULT_OK) {
-                                viewModel.oneTapSignUp(result.data ?: return@launch)
-                            }
-                        }
-                    }
-                )
-                SignUpScreen(
-                    viewModel = viewModel,
-                    navigateToSignDataBisnis = { name, email, password ->
-                        navController.popBackStack()
-                        navController.navigate(Screen.SignDataBisnis.route) {
-                            popUpTo(Screen.SignDataBisnis.route) {
-                                inclusive = true
-                            }
-                        }
-                    },
-                    navigateToSignIn = {
-                        navController.popBackStack()
-                        navController.navigate(Screen.SignIn.route) {
-                            popUpTo(Screen.SignIn.route) { inclusive = true }
-                        }
-                    },
-                    oneTapLogin = {
-                        scope.launch {
-                            val signUpIntent = viewModel.getSignUpIntent()
-                            launcher.launch(
-                                IntentSenderRequest.Builder(
-                                    signUpIntent ?: return@launch
-                                ).build()
-                            )
-                        }
-                    }
-                )
-            }
-            composable(route = Screen.SignDataBisnis.route) {
-                val viewModel = koinViewModel<BisnisViewModel>()
-                val currentUser = viewModel.currentUser
-                SignDataBisnis(
-                    viewmodel = viewModel, onNavigateToSignIn = {
-                        navController.popBackStack()
-                        navController.navigate(Screen.SignIn.route) {
-                            popUpTo(Screen.SignIn.route) {
-                                inclusive = true
-                            }
-                        }
-                    },
-                    onCreateBisnisData = { bisnisName, bisnisCategory, commodity ->
-                        val userId = viewModel.currentUser?.uid
-                        val bisnisId = System.currentTimeMillis()
-                        val bisnis = BusinessModel(
-                            bisnisId = bisnisId.toString(),
-                            bisnisName = bisnisName,
-                            bisnisCategory = bisnisCategory,
-                            commodity = commodity,
-                            userId = userId
-                        )
-                        viewModel.createNewBisnis(bisnis)
-                    }
-                )
-            }
-            composable(route = Screen.SetPhoto.route) {
-                SetPhotoScreen(onNavigateToSignIn = {
-                    navController.navigate(Screen.SignIn.route)
-                })
-            }
-            composable(route = Screen.SignIn.route) {
-                val viewModel = koinViewModel<SignInViewModel>()
-                val scope = rememberCoroutineScope()
-                val launcher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.StartIntentSenderForResult(),
-                    onResult = { result ->
-                        scope.launch {
-                            if (result.resultCode == RESULT_OK) {
-                                viewModel.oneTapSignIn(result.data ?: return@launch)
-                            }
-                        }
-                    }
-                )
-                LogInScreen(viewModel = viewModel, oneTapSignIn = {
-                    scope.launch {
-                        val signInIntent = viewModel.getSignInIntent()
-                        launcher.launch(
-                            IntentSenderRequest.Builder(
-                                signInIntent ?: return@launch
-                            ).build()
-                        )
-
-                    }
-
-                }, onNavigateToHome = {
-                    navController.navigate(Screen.Home.route)
-                }, onNavigateToSignUp = {
-                    navController.navigate(Screen.SignUp.route)
-                })
-            }
-            composable(route = Screen.Pembukuan.route) {
-                val viewModel = koinViewModel<BookViewModel>()
-                val state = viewModel.listBook.collectAsStateWithLifecycle().value
-                BooksScreen(
-                    state = state,
-                    onNavigateToCreateBook = { navController.navigate(Screen.CreateNewRecord.route) },
-                    onNavigateToLaporanScreen = { route ->
-                        navController.navigate(route)
-                    },
-                    fetchListBook = {
-                        viewModel.fetchBooks()
-                    },
-                    resetState = {
-                        viewModel.resetUiState
-                    }
-                )
-            }
-            composable(route = Screen.Statistik.route) {
-                StatistikScreen()
-            }
-            composable(route = Screen.Pembayaran.route) {
-                PembayaranScreen(
-                    onNavigateToCreateNewPayment = {
-                        navController.navigate(Screen.CreateNewPayment.route)
-                    }
-                )
-            }
-            composable(route = Screen.Setting.route) {
-                val viewModel = koinViewModel<SettingViewModel>()
-                SettingScreen(
-                    viewModel = viewModel,
-                    onNavigateToEditProfile = {
-                        navController.navigate(Screen.EditProfileUser.route)
-                    },
-                    signOut = {
-                        viewModel.signOut()
-                        navController.popBackStack()
-                        navController.navigate(Screen.SignIn.route)
-                    }
-                )
-            }
-            composable(route = Screen.EditProfileUser.route) {
-                EditProfileUserScreen(onNavigateBack = { navController.navigateUp() })
-            }
-            composable(route = Screen.CreateNewRecord.route) {
-                val viewModel = koinViewModel<BookViewModel>()
-                CreateNewRecordScreen(
-                    viewModel = viewModel,
-                    onCreateNewBook = { bookModel ->
-                        viewModel.createNewBook(bookModel)
-                    },
-                    onNavigateBack = {
-                        navController.navigateUp()
-                    },
-                )
-            }
-            composable(route = Screen.CreateNewPayment.route) {
-                CreateNewPaymentScreen(
-                    onNavigateBack = {
-                        navController.navigateUp()
-                    }
-                )
-            }
-            composable(route = Screen.FinancialStatement.route) {
-                FinancialStatementScreen(onNavigateBack = {
-                    navController.navigateUp()
-                })
-            }
         }
     }
 }

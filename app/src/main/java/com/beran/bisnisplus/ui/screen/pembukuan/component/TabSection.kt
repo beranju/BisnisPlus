@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.beran.bisnisplus.constant.BookTypes
+import com.beran.bisnisplus.ui.component.EmptyView
 import com.beran.bisnisplus.ui.screen.pembukuan.TabContentScreen
 import com.beran.core.domain.model.BookModel
 import kotlinx.coroutines.launch
@@ -41,6 +43,8 @@ import kotlinx.coroutines.launch
 fun BookTabsSection(
     incomeList: List<Pair<Long?, List<BookModel>>>,
     expenseList: List<Pair<Long?, List<BookModel>>>,
+    onNavigateToEdit: (String) -> Unit,
+    deleteBook: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState()
@@ -51,7 +55,9 @@ fun BookTabsSection(
         TabsContent(
             pagerState = pagerState,
             incomeList = incomeList,
-            expenseList = expenseList
+            expenseList = expenseList,
+            onNavigateToEdit = onNavigateToEdit,
+            deleteBook = deleteBook
         )
     }
 }
@@ -62,13 +68,41 @@ fun BookTabsSection(
 private fun TabsContent(
     incomeList: List<Pair<Long?, List<BookModel>>>,
     expenseList: List<Pair<Long?, List<BookModel>>>,
+    onNavigateToEdit: (String) -> Unit,
+    deleteBook: (String) -> Unit,
     pagerState: PagerState, modifier: Modifier = Modifier
 ) {
-    HorizontalPager(pageCount = 2, state = pagerState, modifier = modifier) { page ->
+    HorizontalPager(pageCount = 2, state = pagerState) { page ->
         when (page) {
-            0 -> TabContentScreen(listBook = incomeList)
-            1 -> TabContentScreen(listBook = expenseList)
+            0 -> {
+                Box(modifier = modifier) {
+                    if (incomeList.isEmpty()) {
+                        EmptyView(hintText = "Mulai catat pemasukan anda")
+                    } else {
+                        TabContentScreen(
+                            listBook = incomeList,
+                            onNavigateToEdit = onNavigateToEdit,
+                            deleteBook = deleteBook
+                        )
+                    }
+                }
+            }
+
+            1 -> {
+                Box(modifier = modifier) {
+                    if (expenseList.isEmpty()) {
+                        EmptyView(hintText = "Mulai catat pengeluaran anda")
+                    } else {
+                        TabContentScreen(
+                            listBook = expenseList,
+                            onNavigateToEdit = onNavigateToEdit,
+                            deleteBook = deleteBook
+                        )
+                    }
+                }
+            }
         }
+
     }
 }
 

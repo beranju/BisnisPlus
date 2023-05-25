@@ -3,8 +3,12 @@ package com.beran.bisnisplus.di
 import com.beran.bisnisplus.ui.screen.auth.dataBisnis.BisnisViewModel
 import com.beran.bisnisplus.ui.screen.auth.signUp.SignUpViewModel
 import com.beran.bisnisplus.ui.screen.auth.signin.SignInViewModel
+import com.beran.bisnisplus.ui.screen.home.common.HomeViewModel
 import com.beran.bisnisplus.ui.screen.onboarding.OnBoardViewModel
 import com.beran.bisnisplus.ui.screen.pembukuan.BookViewModel
+import com.beran.bisnisplus.ui.screen.pembukuan.create.CreateBookViewModel
+import com.beran.bisnisplus.ui.screen.pembukuan.edit.EditBookViewModel
+import com.beran.bisnisplus.ui.screen.pembukuan.report.FinancialReportViewModel
 import com.beran.bisnisplus.ui.screen.setting.SettingViewModel
 import com.beran.bisnisplus.ui.screen.splash.SplashViewModel
 import com.beran.core.domain.usecase.AuthInteractor
@@ -34,6 +38,13 @@ val viewModelModule = module {
     viewModel { SplashViewModel(get()) }
     viewModel { SettingViewModel(get()) }
     viewModel { OnBoardViewModel(get()) }
+    viewModel { HomeViewModel(get()) }
     viewModel { BisnisViewModel(get(), get()) }
+}
+
+val bookViewModelModule = module {
+    viewModel { EditBookViewModel(get()) }
+    viewModel { CreateBookViewModel(get()) }
+    viewModel { FinancialReportViewModel(get()) }
     viewModel { BookViewModel(useCase = get(), authUseCase = get()) }
 }

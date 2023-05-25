@@ -6,6 +6,7 @@ object Constant {
     const val userRef = "user"
     const val bisnisRef = "bisnis"
     const val bookRef = "book"
+    const val books = "books"
 
     const val signIn = "signIn"
     const val signUp = "signUp"
@@ -18,4 +19,10 @@ object Constant {
     // ** book screen usage
     const val Income = "Pemasukan"
     const val Expense = "Pengeluaran"
+
+    // ** books constant
+    const val bookId = "bookId"
+
+    // ** error Text
+    const val UnknownError = "Something went wrong!"
 }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,10 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NavigateNext
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,17 +23,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.beran.bisnisplus.ui.screen.pembukuan.component.BooksCard
-import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import com.beran.bisnisplus.utils.Utils
 import com.beran.bisnisplus.utils.Utils.convertToDate
 import com.beran.core.domain.model.BookModel
@@ -47,6 +39,8 @@ import com.beran.core.domain.model.BookModel
 @Composable
 fun TabContentScreen(
     listBook: List<Pair<Long?, List<BookModel>>>,
+    onNavigateToEdit: (String) -> Unit,
+    deleteBook: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var size by remember {
@@ -58,7 +52,13 @@ fun TabContentScreen(
         .onGloballyPositioned { coordinate ->
             size = coordinate.size.toSize()
         }) {
-        ListBookSection(size = size, listBook = listBook)
+        ListBookSection(
+            size = size,
+            listBook = listBook,
+            onNavigateToEdit = onNavigateToEdit,
+            deleteBook = deleteBook
+        )
+
     }
 }
 
@@ -67,6 +67,8 @@ fun TabContentScreen(
 @Composable
 private fun ListBookSection(
     listBook: List<Pair<Long?, List<BookModel>>>,
+    onNavigateToEdit: (String) -> Unit,
+    deleteBook: (String) -> Unit,
     size: Size
 ) {
     val localDensity = LocalDensity.current
@@ -78,7 +80,11 @@ private fun ListBookSection(
             val totalAmountFormatted = Utils.rupiahFormatter(totalAmount)
             stickyHeader { DateSection(timeStamp) }
             items(list, key = { item -> item.bookId.orEmpty() }) { book ->
-                BooksCard(book = book)
+                BooksCard(
+                    book = book,
+                    onNavigateToEdit = onNavigateToEdit,
+                    deleteBook = deleteBook
+                )
             }
             item {
                 Row(
@@ -113,12 +119,12 @@ private fun DateSection(
         Text(text = dateString, style = MaterialTheme.typography.bodySmall)
     }
 }
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun TabContentScreenPrev() {
-    BisnisPlusTheme {
-        TabContentScreen(emptyList())
-    }
-}
+//
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Preview(showBackground = true)
+//@Composable
+//fun TabContentScreenPrev() {
+//    BisnisPlusTheme {
+//        TabContentScreen(emptyList(), onNavigateToEdit = {})
+//    }
+//}

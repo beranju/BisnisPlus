@@ -17,29 +17,33 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.beran.bisnisplus.ui.navigation.MainScreen
 import com.beran.bisnisplus.ui.navigation.NavigationItem
-import com.beran.bisnisplus.ui.navigation.Screen
 
 @Composable
 fun BottomBar(navController: NavHostController, modifier: Modifier = Modifier) {
     val navigationItem = listOf(
-        NavigationItem(title = "Home", icon = Icons.Outlined.Home, screen = Screen.Home),
+        NavigationItem(title = "Home", icon = Icons.Outlined.Home, screen = MainScreen.Home),
         NavigationItem(
             title = "Buku",
             icon = Icons.Outlined.ListAlt,
-            screen = Screen.Pembukuan
+            screen = MainScreen.Pembukuan
         ),
         NavigationItem(
             title = "Statistik",
             icon = Icons.Outlined.Analytics,
-            screen = Screen.Statistik
+            screen = MainScreen.Statistik
         ),
         NavigationItem(
             title = "Tagihan",
             icon = Icons.Outlined.CreditCard,
-            screen = Screen.Pembayaran
+            screen = MainScreen.Pembayaran
         ),
-        NavigationItem(title = "Setting", icon = Icons.Outlined.Settings, screen = Screen.Setting),
+        NavigationItem(
+            title = "Setting",
+            icon = Icons.Outlined.Settings,
+            screen = MainScreen.Setting
+        ),
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
@@ -66,8 +70,13 @@ fun BottomBar(navController: NavHostController, modifier: Modifier = Modifier) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                         }
-                        launchSingleTop = true
                         restoreState = true
+                        launchSingleTop = true
+//                        popUpTo(Screen.Home.route) {
+//                            saveState = true
+//                        }
+//                        restoreState = true
+//                        launchSingleTop = true
                     }
                 },
             )

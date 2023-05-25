@@ -40,7 +40,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -55,7 +54,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.beran.bisnisplus.constant.BookTypes
 import com.beran.bisnisplus.constant.ExpenseCategory
 import com.beran.bisnisplus.constant.Status
@@ -68,7 +66,7 @@ import com.beran.bisnisplus.ui.component.ExpensesCustomDropdown
 import com.beran.bisnisplus.ui.component.IncomeCustomDropdown
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import com.beran.bisnisplus.utils.Utils
-import com.beran.bisnisplus.utils.Utils.toEpochMilli
+import com.beran.bisnisplus.utils.toEpochMilli
 import com.beran.core.domain.model.BookModel
 import com.beran.core.domain.model.StockItem
 import com.beran.core.domain.model.Stocks
@@ -79,23 +77,71 @@ import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.calendar.models.CalendarStyle
-import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun CreateNewRecordScreen(
+    state: BookState<Unit>,
+    onCreateNewBook: (BookModel) -> Unit,
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    val scrollState = rememberScrollState()
+
+    Scaffold(topBar = {
+        CustomAppBar(
+            titleAppBar = "Buat Pembukuan",
+            onLeadingClick = onNavigateBack,
+            leadingIcon = Icons.Outlined.NavigateBefore
+        )
+    }) { innerPadding ->
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(scrollState)
+        ) {
+            when (state) {
+                is BookState.Initial -> {
+                    CreateNewRecordContent(
+                        onCreateNewBook = onCreateNewBook,
+                        onNavigateBack = onNavigateBack, modifier = modifier
+                    )
+                }
+
+                is BookState.Loading -> {}
+                is BookState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .background(MaterialTheme.colorScheme.background),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = state.message)
+                    }
+                }
+
+                is BookState.Success -> onNavigateBack()
+            }
+
+        }
+    }
+
+}
 
 @OptIn(ExperimentalPermissionsApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun CreateNewRecordScreen(
-    viewModel: BookViewModel,
+fun CreateNewRecordContent(
     onCreateNewBook: (BookModel) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val permissionState = rememberPermissionState(Manifest.permission.READ_CONTACTS)
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val scrollState = rememberScrollState()
     val listStock = remember {
         mutableStateListOf<StockItem>()
     }
@@ -154,198 +200,174 @@ fun CreateNewRecordScreen(
         }
     )
 
-    DisposableEffect(key1 = state, effect = {
-        when (state) {
-            is BookState.Loading -> loading = true
-            is BookState.Error -> errorText = (state as BookState.Error).message
-            is BookState.Success -> onNavigateBack()
-            is BookState.Initial -> {}
-        }
-        onDispose { viewModel.resetUiState }
-    })
 
-    Scaffold(topBar = {
-        CustomAppBar(
-            titleAppBar = "Buat Pembukuan",
-            onLeadingClick = onNavigateBack,
-            leadingIcon = Icons.Outlined.NavigateBefore
-        )
-    }) { innerPadding ->
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(scrollState)
-        ) {
-            Column(
+    Column(
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+    ) {
+        if (errorText != null) {
+            Box(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .padding(vertical = 4.dp, horizontal = 6.dp)
             ) {
-                if (errorText != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.errorContainer)
-                            .padding(vertical = 4.dp, horizontal = 6.dp)
-                    ) {
-                        Text(
-                            text = errorText.orEmpty(),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-
-                BookTypeSection(
-                    selected = selectedType,
-                    onSelected = { newValue ->
-                        selectedType = newValue
-                        selectedCategory = ""
-                    }
+                Text(
+                    text = errorText.orEmpty(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer
                 )
-                BookCategorySection(
-                    selectedType = selectedType,
-                    selectedValue = selectedCategory,
-                    onChangeValue = { newValue -> selectedCategory = newValue },
-                    isExpanded = expanded,
-                    onChangeExpanded = { newValue -> expanded = newValue }
-                )
-                if (selectedCategory == ExpenseCategory.Stock.title) {
-                    BookFormStockSection(
-                        mitraName = mitraName,
-                        onChangeMitraName = { newName -> mitraName = newName },
-                        selectedStatus = selectedStatus,
-                        onSelectedStatus = { status -> selectedStatus = status },
-                        onAddNewStock = { stock ->
-                            listStock.add(stock)
-                        },
-                        listStock = listStock,
-                        totalAmount = totalAmount,
-                        onGetContact = {
-                            if (permissionState.hasPermission) {
-                                pickContactLauncher.launch(contactIntent)
-                            } else if (permissionState.permissionRequested) {
-                                pickContactLauncher.launch(contactIntent)
-                            } else {
-                                permissionState.launchPermissionRequest()
-                            }
-                        }
-                    )
-                } else {
-                    BookFormSection(
-                        amount = amountText,
-                        onChangeAmount = { newValue -> amountText = newValue },
-                        selectedStatus = selectedStatus,
-                        onSelectedStatus = { newStatus -> selectedStatus = newStatus }
-                    )
-                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+        }
 
-                if (selectedCategory == ExpenseCategory.Stock.title) {
-                    StockOptionalFormSection(
-                        date = formattedDate,
-                        onChangeDate = { },
-                        note = note,
-                        onChangeNote = { newNote -> note = newNote },
-                        onCalendarSelection = { newDate ->
-                            selectedDate = newDate
-                        }
-                    )
-                } else {
-                    OptionalFormSection(
-                        mitraName = mitraName,
-                        onChangeMitraName = { newName -> mitraName = newName },
-                        date = formattedDate,
-                        onChangeDate = { },
-                        note = note,
-                        onChangeNote = { newNote -> note = newNote },
-                        onCalendarSelection = { newDate ->
-                            selectedDate = newDate
-                        },
-                        selectedDate = selectedDate,
-                        onGetContact = {
-                            if (permissionState.hasPermission) {
-                                pickContactLauncher.launch(contactIntent)
-                            } else if (permissionState.permissionRequested) {
-                                pickContactLauncher.launch(contactIntent)
-                            } else {
-                                permissionState.launchPermissionRequest()
-                            }
-                        }
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 30.dp)
-                ) {
-                    Button(onClick = {
-                        val bookId = System.currentTimeMillis().toString()
-                        if (selectedCategory.isNotEmpty()) {
-                            if (selectedCategory == ExpenseCategory.Stock.title) {
-                                if (listStock.isNotEmpty() && mitraName.isNotEmpty()) {
-                                    val stocks = Stocks(
-                                        stocks = listStock.toList()
-                                    )
-                                    val bookModel = BookModel(
-                                        bookId = bookId,
-                                        amount = totalAmount,
-                                        mitra = mitraName,
-                                        note = note,
-                                        category = selectedCategory,
-                                        listStock = stocks,
-                                        type = selectedType,
-                                        state = selectedStatus,
-                                        createdAt = selectedDate.toEpochMilli()
-                                    )
-                                    onCreateNewBook(bookModel)
-                                } else {
-                                    errorText = "Stok dan nama mitra tidak boleh kosong"
-                                }
-
-                            } else {
-                                if (amountText.isNotEmpty()) {
-                                    val amount =
-                                        amountText.replace("[.,]".toRegex(), "").toDoubleOrNull()
-                                    val bookModel = BookModel(
-                                        bookId = bookId,
-                                        amount = amount ?: 0.0,
-                                        mitra = mitraName,
-                                        note = note,
-                                        category = selectedCategory,
-                                        type = selectedType,
-                                        state = selectedStatus,
-                                        createdAt = selectedDate.toEpochMilli()
-                                    )
-                                    onCreateNewBook(bookModel)
-                                } else {
-                                    errorText = "Jumlah tidak boleh kosong"
-                                }
-                            }
-                        } else {
-                            errorText = "Kategori tidak boleh kosong"
-                        }
-
-                    }, enabled = !loading, modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "Tambahkan")
+        BookTypeSection(
+            selected = selectedType,
+            onSelected = { newValue ->
+                selectedType = newValue
+                selectedCategory = ""
+            }
+        )
+        BookCategorySection(
+            selectedType = selectedType,
+            selectedValue = selectedCategory,
+            onChangeValue = { newValue -> selectedCategory = newValue },
+            isExpanded = expanded,
+            onChangeExpanded = { newValue -> expanded = newValue }
+        )
+        if (selectedCategory == ExpenseCategory.Stock.title) {
+            BookFormStockSection(
+                mitraName = mitraName,
+                onChangeMitraName = { newName -> mitraName = newName },
+                selectedStatus = selectedStatus,
+                onSelectedStatus = { status -> selectedStatus = status },
+                onAddNewStock = { stock ->
+                    listStock.add(stock)
+                },
+                listStock = listStock,
+                totalAmount = totalAmount,
+                onGetContact = {
+                    if (permissionState.hasPermission) {
+                        pickContactLauncher.launch(contactIntent)
+                    } else if (permissionState.permissionRequested) {
+                        pickContactLauncher.launch(contactIntent)
+                    } else {
+                        permissionState.launchPermissionRequest()
                     }
-                    if (loading) {
-                        errorText = null
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .align(Alignment.CenterEnd)
-                        ) {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .size(25.dp)
+                }
+            )
+        } else {
+            BookFormSection(
+                amount = amountText,
+                onChangeAmount = { newValue -> amountText = newValue },
+                selectedStatus = selectedStatus,
+                onSelectedStatus = { newStatus -> selectedStatus = newStatus }
+            )
+        }
+
+        if (selectedCategory == ExpenseCategory.Stock.title) {
+            StockOptionalFormSection(
+                date = formattedDate,
+                onChangeDate = { },
+                note = note,
+                onChangeNote = { newNote -> note = newNote },
+                onCalendarSelection = { newDate ->
+                    selectedDate = newDate
+                }
+            )
+        } else {
+            OptionalFormSection(
+                mitraName = mitraName,
+                onChangeMitraName = { newName -> mitraName = newName },
+                date = formattedDate,
+                onChangeDate = { },
+                note = note,
+                onChangeNote = { newNote -> note = newNote },
+                onCalendarSelection = { newDate ->
+                    selectedDate = newDate
+                },
+                selectedDate = selectedDate,
+                onGetContact = {
+                    if (permissionState.hasPermission) {
+                        pickContactLauncher.launch(contactIntent)
+                    } else if (permissionState.permissionRequested) {
+                        pickContactLauncher.launch(contactIntent)
+                    } else {
+                        permissionState.launchPermissionRequest()
+                    }
+                }
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 30.dp)
+        ) {
+            Button(onClick = {
+                val bookId = System.currentTimeMillis().toString()
+                if (selectedCategory.isNotEmpty()) {
+                    if (selectedCategory == ExpenseCategory.Stock.title) {
+                        if (listStock.isNotEmpty() && mitraName.isNotEmpty()) {
+                            val stocks = Stocks(
+                                stocks = listStock.toList()
                             )
+                            val bookModel = BookModel(
+                                bookId = bookId,
+                                amount = totalAmount,
+                                mitra = mitraName,
+                                note = note,
+                                category = selectedCategory,
+                                listStock = stocks,
+                                type = selectedType,
+                                state = selectedStatus,
+                                createdAt = selectedDate.toEpochMilli()
+                            )
+                            onCreateNewBook(bookModel)
+                        } else {
+                            errorText = "Stok dan nama mitra tidak boleh kosong"
+                        }
+
+                    } else {
+                        if (amountText.isNotEmpty()) {
+                            val amount =
+                                amountText.replace("[.,]".toRegex(), "").toDoubleOrNull()
+                            val bookModel = BookModel(
+                                bookId = bookId,
+                                amount = amount ?: 0.0,
+                                mitra = mitraName,
+                                note = note,
+                                category = selectedCategory,
+                                type = selectedType,
+                                state = selectedStatus,
+                                createdAt = selectedDate.toEpochMilli()
+                            )
+                            onCreateNewBook(bookModel)
+                        } else {
+                            errorText = "Jumlah tidak boleh kosong"
                         }
                     }
+                } else {
+                    errorText = "Kategori tidak boleh kosong"
+                }
+
+            }, enabled = !loading, modifier = Modifier.fillMaxWidth()) {
+                Text(text = "Tambahkan")
+            }
+            if (loading) {
+                errorText = null
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .align(Alignment.CenterEnd)
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(25.dp)
+                    )
                 }
             }
         }
@@ -694,7 +716,7 @@ fun BookTypeBadge(
 fun CreateNewRecordScreenPrev() {
     BisnisPlusTheme {
         CreateNewRecordScreen(
-            viewModel = koinViewModel(),
+            state = BookState.Initial,
             onCreateNewBook = {},
             onNavigateBack = {},
         )

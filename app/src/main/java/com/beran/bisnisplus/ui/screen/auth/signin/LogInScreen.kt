@@ -45,6 +45,7 @@ import com.beran.bisnisplus.ui.component.CustomTextField
 import com.beran.bisnisplus.ui.screen.auth.signin.SignInState
 import com.beran.bisnisplus.ui.screen.auth.signin.SignInViewModel
 import com.beran.bisnisplus.utils.Utils
+import com.beran.bisnisplus.utils.isValidEmail
 
 @Composable
 fun LogInScreen(
@@ -133,7 +134,7 @@ fun LogInScreen(
                 value = email,
                 onChangeValue = { newValue ->
                     email = newValue
-                    emailError = if (!Utils.isValidEmail(newValue)) "Email tidak valid" else null
+                    emailError = if (!newValue.isValidEmail()) "Email tidak valid" else null
                 },
                 keyBoardType = KeyboardType.Email,
                 errorText = emailError.orEmpty(),

@@ -12,10 +12,12 @@ data class BookModel(
     var createdAt: Long? = null,
     var updatedAt: Long? = null,
     var listStock: Stocks? = null
-    )
+)
+
 data class Stocks(
     var stocks: List<StockItem> = emptyList()
 )
+
 data class StockItem(
     var stockId: String? = null,
     var stockName: String? = null,
