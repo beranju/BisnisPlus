@@ -1,5 +1,6 @@
 package com.beran.bisnisplus.ui.component
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,19 +20,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.beran.bisnisplus.R
 
 @Composable
-fun CustomImagePickerCircle() {
+fun CustomImagePickerCircle(
+    imageUri: Uri?,
+    onPickPhoto: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(context).data(imageUri).build()
+    )
+
     Box(
-        modifier = Modifier
+        modifier = modifier
             .width(150.dp)
             .height(170.dp)
     ) {
         Image(
-            painter = painterResource(id = R.drawable.img_empty_profile),
+            painter = if (imageUri != null) painter else painterResource(id = R.drawable.img_empty_profile),
             contentDescription = "set photo",
             contentScale = ContentScale.Crop,
             alignment = Alignment.Center,
@@ -45,7 +59,7 @@ fun CustomImagePickerCircle() {
                 )
         )
         IconButton(
-            onClick = {},
+            onClick = onPickPhoto,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .clip(CircleShape)

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.IntentSender
 import com.beran.core.common.Resource
 import com.beran.core.domain.model.UserModel
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 interface AuthUseCase {
@@ -14,8 +15,10 @@ interface AuthUseCase {
     suspend fun getSignUpIntent(): IntentSender?
     fun oneTapSignIn(intent: Intent): Flow<Resource<UserModel>>
     suspend fun getSignInIntent(): IntentSender?
+    fun updateProfile(userModel: UserModel): Flow<Resource<Unit>>
     suspend fun logOut()
-    fun currentUser(): UserModel?
+    suspend fun userDetail(): Flow<Resource<UserModel>>
+    fun currentUser(): FirebaseUser?
     fun showOnBoard(): Flow<Boolean>
     suspend fun setShowOnBoard(isFirst: Boolean)
 }

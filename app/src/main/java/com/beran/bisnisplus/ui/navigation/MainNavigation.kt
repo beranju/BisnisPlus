@@ -31,7 +31,7 @@ import com.beran.bisnisplus.ui.screen.pembukuan.create.CreateBookViewModel
 import com.beran.bisnisplus.ui.screen.pembukuan.edit.EditBookViewModel
 import com.beran.bisnisplus.ui.screen.pembukuan.report.FinancialReportViewModel
 import com.beran.bisnisplus.ui.screen.setting.EditProfileUserScreen
-import com.beran.bisnisplus.ui.screen.setting.SettingViewModel
+import com.beran.bisnisplus.ui.screen.setting.common.SettingViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -148,17 +148,32 @@ fun MainNavigation(
             }
             composable(route = MainScreen.Setting.route) {
                 val viewModel = koinViewModel<SettingViewModel>()
+                val state = viewModel.user.collectAsStateWithLifecycle().value
                 SettingScreen(
-                    viewModel = viewModel,
+                    state = state,
                     onNavigateToEditProfile = {
                         navController.navigate(MainScreen.EditProfileUser.route)
+                    },
+                    fetchUserData = {
+                        viewModel.fetchCurrentUser()
                     },
                     signOut = logOut
                 )
             }
 
             composable(route = MainScreen.EditProfileUser.route) {
-                EditProfileUserScreen(onNavigateBack = { navController.navigateUp() })
+                val viewModel = koinViewModel<SettingViewModel>()
+                val state = viewModel.uiState.collectAsStateWithLifecycle().value
+                val userState = viewModel.user.collectAsStateWithLifecycle().value
+                EditProfileUserScreen(
+                    userState = userState,
+                    state = state,
+                    onUpdateProfile = { userModel ->
+                        viewModel.updateProfile(userModel)
+                    },
+                    onNavigateBack = { navController.navigateUp() },
+                    fetchUserDetail = { viewModel.fetchCurrentUser() }
+                )
             }
             composable(route = MainScreen.CreateNewRecord.route) {
                 val viewModel = koinViewModel<CreateBookViewModel>()

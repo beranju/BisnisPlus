@@ -11,6 +11,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.beran.bisnisplus.ui.navigation.MainNavigation
 import com.beran.bisnisplus.ui.navigation.Screen
 import com.beran.bisnisplus.ui.screen.OnBoardingScreen
@@ -23,9 +24,8 @@ import com.beran.bisnisplus.ui.screen.auth.dataBisnis.BisnisViewModel
 import com.beran.bisnisplus.ui.screen.auth.signUp.SignUpViewModel
 import com.beran.bisnisplus.ui.screen.auth.signin.SignInViewModel
 import com.beran.bisnisplus.ui.screen.onboarding.OnBoardViewModel
-import com.beran.bisnisplus.ui.screen.setting.SettingViewModel
+import com.beran.bisnisplus.ui.screen.setting.common.SettingViewModel
 import com.beran.bisnisplus.ui.screen.splash.SplashViewModel
-import com.beran.core.domain.model.BusinessModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -109,29 +109,13 @@ fun AppNavigation(navController: NavHostController, mainNavController: NavHostCo
                 viewmodel = viewModel,
                 onNavigateToHome = {
                     navController.navigate(Screen.Main.route) {
-                        popUpTo(Screen.SignIn.route) {
+                        popUpTo(Screen.SignDataBisnis.route) {
                             inclusive = true
                         }
                     }
                 },
-                onCreateBisnisData = { bisnisName, bisnisCategory, commodity ->
-                    val userId = viewModel.currentUser?.uid
-                    val bisnisId = System.currentTimeMillis()
-                    val bisnis = BusinessModel(
-                        bisnisId = bisnisId.toString(),
-                        bisnisName = bisnisName,
-                        bisnisCategory = bisnisCategory,
-                        commodity = commodity,
-                        userId = userId
-                    )
-                    viewModel.createNewBisnis(bisnis)
-                }
-            )
-        }
-        composable(route = Screen.SetPhoto.route) {
-            SetPhotoScreen(
-                onNavigateToSignIn = {
-                    navController.navigate(Screen.SignIn.route)
+                onCreateBisnisData = { businessModel ->
+                    viewModel.createNewBisnis(businessModel)
                 }
             )
         }
@@ -173,7 +157,7 @@ fun AppNavigation(navController: NavHostController, mainNavController: NavHostCo
         composable(route = Screen.Main.route) {
             val viewModel = koinViewModel<SettingViewModel>()
             MainNavigation(
-                navController = mainNavController,
+                navController = rememberNavController(),
                 logOut = {
                     viewModel.signOut()
                     navController.navigate(Screen.SignIn.route) {

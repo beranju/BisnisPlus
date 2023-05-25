@@ -7,17 +7,30 @@ import com.beran.core.domain.model.BusinessModel
 import com.beran.core.domain.model.UserModel
 import com.beran.core.domain.usecase.AuthUseCase
 import com.beran.core.domain.usecase.bisnis.BisnisUseCase
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class BisnisViewModel(private val useCase: BisnisUseCase, private val authUseCase: AuthUseCase) : ViewModel() {
+class BisnisViewModel(private val useCase: BisnisUseCase, val authUseCase: AuthUseCase) :
+    ViewModel() {
     private var _uiState: MutableStateFlow<BisnisState> = MutableStateFlow(BisnisState.Initial)
     val uiState get() = _uiState.asStateFlow()
 
-    val currentUser: UserModel? = authUseCase.currentUser()
+    var currentUser: FirebaseUser? = null
 
-    fun createNewBisnis(businessModel: BusinessModel
+    init {
+        fetchUser()
+    }
+
+    private fun fetchUser() {
+        viewModelScope.launch {
+            currentUser = authUseCase.currentUser()
+        }
+    }
+
+    fun createNewBisnis(
+        businessModel: BusinessModel
     ) {
         viewModelScope.launch {
             useCase.createNewBisnis(businessModel)

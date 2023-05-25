@@ -15,6 +15,10 @@ class HomeViewModel(private val bookUseCase: BookUseCase) : ViewModel() {
         MutableStateFlow(HomeState.Loading)
     val listBook get() = _listBook.asStateFlow()
 
+    init {
+        fetchListBook()
+    }
+
     fun fetchListBook() {
         viewModelScope.launch {
             bookUseCase.fetchAllBook().collect { result ->

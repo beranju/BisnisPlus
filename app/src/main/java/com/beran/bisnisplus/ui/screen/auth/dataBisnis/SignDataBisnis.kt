@@ -32,16 +32,22 @@ import com.beran.bisnisplus.ui.component.CustomDataFormField
 import com.beran.bisnisplus.ui.screen.auth.dataBisnis.BisnisState
 import com.beran.bisnisplus.ui.screen.auth.dataBisnis.BisnisViewModel
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
+import com.beran.bisnisplus.utils.Utils
+import com.beran.core.domain.model.BusinessModel
+import com.beran.core.domain.model.UserModel
+import com.google.firebase.auth.FirebaseUser
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SignDataBisnis(
     viewmodel: BisnisViewModel,
     onNavigateToHome: () -> Unit,
-    onCreateBisnisData: (bisnisName: String, bisnisCategory: String, commodity: String) -> Unit
+    onCreateBisnisData: (BusinessModel) -> Unit
 ) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle().value
+    val currentUser: FirebaseUser? = viewmodel.currentUser
     SignDataBisnisContent(
+        user = currentUser,
         state = state,
         onNavigateToHome = onNavigateToHome,
         onCreateBisnisData = onCreateBisnisData
@@ -50,9 +56,10 @@ fun SignDataBisnis(
 
 @Composable
 fun SignDataBisnisContent(
+    user: FirebaseUser?,
     state: BisnisState,
     onNavigateToHome: () -> Unit,
-    onCreateBisnisData: (bisnisName: String, bisnisCategory: String, commodity: String) -> Unit
+    onCreateBisnisData: (BusinessModel) -> Unit
 ) {
     var bisnisName by remember {
         mutableStateOf("")
@@ -144,13 +151,23 @@ fun SignDataBisnisContent(
             Box(modifier = Modifier.fillMaxWidth()) {
                 Button(
                     onClick = {
-                        if (bisnisName.isNotEmpty() && bisnisCategory.isNotEmpty() && commodity.isNotEmpty())
-                            onCreateBisnisData(bisnisName, bisnisCategory, commodity)
+                        if (bisnisName.isNotEmpty() && bisnisCategory.isNotEmpty() && commodity.isNotEmpty()) {
+                            val bisnisId = Utils.generateUUid()
+                            val createdAt = System.currentTimeMillis()
+                            val userId = user?.uid
+                            val businessModel = BusinessModel(
+                                bisnisId = bisnisId,
+                                userId = userId,
+                                bisnisName = bisnisName,
+                                bisnisCategory = bisnisCategory,
+                                commodity = commodity,
+                                createdAt = createdAt
+                            )
+                            onCreateBisnisData(businessModel)
+                        }
                     }, enabled = !isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
                         text = stringResource(id = R.string.txt_selanjutnya),
@@ -182,7 +199,7 @@ fun SignDataBisnisPrev() {
     BisnisPlusTheme {
         SignDataBisnis(
             viewmodel = koinViewModel(),
-            onCreateBisnisData = { _, _, _ -> },
+            onCreateBisnisData = {},
             onNavigateToHome = {})
     }
 }

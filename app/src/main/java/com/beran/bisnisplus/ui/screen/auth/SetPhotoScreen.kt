@@ -39,7 +39,7 @@ fun SetPhotoScreen(onNavigateToSignIn: () -> Unit) {
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(50.dp))
-            CustomImagePickerCircle()
+//            CustomImagePickerCircle()
             Spacer(modifier = Modifier.height(200.dp))
             Button(
                 onClick = onNavigateToSignIn,

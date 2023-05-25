@@ -12,6 +12,7 @@ import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
@@ -21,6 +22,7 @@ import kotlin.coroutines.CoroutineContext
 val authModule = module {
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
+    single { FirebaseStorage.getInstance() }
     single { Identity.getSignInClient(androidContext()) }
     single(named(Constant.signIn)) {
         BeginSignInRequest.builder()
@@ -49,6 +51,7 @@ val authModule = module {
     single<IAuthRepository> {
         AuthRepository(
             androidContext(),
+            get(),
             get(),
             get(),
             get(),

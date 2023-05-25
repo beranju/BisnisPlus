@@ -306,7 +306,7 @@ fun CreateNewRecordContent(
                 .padding(top = 30.dp)
         ) {
             Button(onClick = {
-                val bookId = System.currentTimeMillis().toString()
+                val bookId = Utils.generateUUid()
                 if (selectedCategory.isNotEmpty()) {
                     if (selectedCategory == ExpenseCategory.Stock.title) {
                         if (listStock.isNotEmpty() && mitraName.isNotEmpty()) {

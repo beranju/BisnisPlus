@@ -74,7 +74,7 @@ fun FinancialStatementScreen(
 ) {
     val options: List<String> = TimeRange.values().toList().map { it.range }
     val context = LocalContext.current
-    var filePath: String? = null
+    var filePath: String?
     val permissionState =
         rememberPermissionState(permission = Manifest.permission.WRITE_EXTERNAL_STORAGE)
 //    val fileId = System.currentTimeMillis()

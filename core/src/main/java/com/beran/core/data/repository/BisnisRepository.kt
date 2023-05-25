@@ -33,7 +33,7 @@ class BisnisRepository(
                 if (userDocuments.isNotEmpty()) {
                     val id = userDocuments.first().id
                     firestore.collection(Constant.userRef).document(id)
-                        .update("bisnisId", FieldValue.arrayUnion(businessModel.bisnisId)).await()
+                        .update("bisnisId", businessModel.bisnisId).await()
                     emit(Resource.Success(Unit))
                 } else {
                     emit(Resource.Error("No resource found"))

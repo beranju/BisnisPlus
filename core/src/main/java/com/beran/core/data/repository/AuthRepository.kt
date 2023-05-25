@@ -3,6 +3,8 @@ package com.beran.core.data.repository
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import android.net.Uri
+import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -10,14 +12,17 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import com.beran.core.common.Constant
 import com.beran.core.common.Resource
+import com.beran.core.common.asMap
 import com.beran.core.domain.model.UserModel
 import com.beran.core.domain.repository.IAuthRepository
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -33,6 +38,7 @@ class AuthRepository(
     private val context: Context,
     private val auth: FirebaseAuth,
     private val fireStore: FirebaseFirestore,
+    private val storage: FirebaseStorage,
     private var oneTapClient: SignInClient,
     private var signInRequest: BeginSignInRequest,
     private var signUpRequest: BeginSignInRequest,
@@ -58,7 +64,8 @@ class AuthRepository(
                         UserModel(
                             uid = it.uid,
                             name = it.displayName.orEmpty(),
-                            email = it.email.orEmpty()
+                            email = it.email.orEmpty(),
+                            createdAt = System.currentTimeMillis()
                         )
                     }
                     fireStore.collection(Constant.userRef).add(userModel).await()
@@ -95,7 +102,8 @@ class AuthRepository(
                     val data = UserModel(
                         uid = user.uid,
                         name = user.displayName.orEmpty(),
-                        email = user.email.orEmpty()
+                        email = user.email.orEmpty(),
+                        createdAt = System.currentTimeMillis()
                     )
                     emit(Resource.Success(data))
                     fireStore.collection(Constant.userRef).add(data).await()
@@ -156,6 +164,28 @@ class AuthRepository(
         return result?.pendingIntent?.intentSender
     }
 
+    override fun updateProfile(userModel: UserModel): Flow<Resource<Unit>> = flow {
+        emit(Resource.Loading)
+        try {
+            val storageRef = storage.reference
+            val imgUrl: Uri? = if (userModel.photoUrl?.isNotEmpty() == true)
+                storageRef.child(userModel.uid.toString()).putFile(userModel.uid?.toUri()!!)
+                    .await().storage.downloadUrl.await()
+            else null
+            val updatedData = userModel.copy(photoUrl = imgUrl.toString())
+            val dataAsMap = updatedData.asMap()
+            val userQuerySnapshot =
+                fireStore.collection(Constant.userRef).whereEqualTo("uid", userModel.uid).get()
+                    .await()
+            val userDocId: String = userQuerySnapshot.documents.map { it.id }.first()
+            fireStore.collection(Constant.userRef).document(userDocId).update(dataAsMap).await()
+            emit(Resource.Success(Unit))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emit(Resource.Error(e.message ?: Constant.UnknownError))
+        }
+    }
+
 
     override fun isLogin(): Boolean = auth.currentUser != null
 
@@ -164,15 +194,34 @@ class AuthRepository(
         auth.signOut()
     }
 
-    override fun currentUser(): UserModel? = auth.currentUser?.run {
-        UserModel(
-            uid = uid,
-            name = displayName.orEmpty(),
-            email = displayName.orEmpty(),
-            phoneNumber = phoneNumber,
-            photoUrl = photoUrl.toString()
-        )
-    }
+    override suspend fun userDetail(): Flow<Resource<UserModel>> = flow<Resource<UserModel>> {
+        emit(Resource.Loading)
+        try {
+            val currentUser = auth.currentUser
+            currentUser?.let { user ->
+                val userfQuerySnapshot =
+                    fireStore.collection(Constant.userRef).whereEqualTo("uid", user.uid).get()
+                        .await()
+                val userDoc = userfQuerySnapshot.documents.first()
+                val userToModel = userDoc.toObject(UserModel::class.java)
+                val userModel = UserModel(
+                    uid = userToModel?.uid,
+                    name = userToModel?.name,
+                    email = userToModel?.email,
+                    photoUrl = userToModel?.photoUrl,
+                    phoneNumber = userToModel?.phoneNumber,
+                    bisnisId = userToModel?.bisnisId,
+                    createdAt = userToModel?.createdAt,
+                )
+                emit(Resource.Success(userModel))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emit(Resource.Error(e.message ?: Constant.UnknownError))
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override fun currentUser(): FirebaseUser? = auth.currentUser
 
     override fun showOnBoard(): Flow<Boolean> = context.onBoardSession.data.map {
         it[isFirstLaunch] ?: true

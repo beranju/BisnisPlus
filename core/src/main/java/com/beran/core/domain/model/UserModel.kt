@@ -6,7 +6,7 @@ data class UserModel(
     val email: String? = null,
     val phoneNumber: String? = null,
     val photoUrl: String? = null,
-    val bisnisId: List<String>? = null,
+    val bisnisId: String? = null,
     val createdAt: Long? = null,
     val updatedAt: Long? = null
 )

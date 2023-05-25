@@ -1,15 +1,22 @@
 package com.beran.bisnisplus.ui.screen.setting
 
+import android.Manifest
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.NavigateBefore
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -26,24 +33,82 @@ import com.beran.bisnisplus.R
 import com.beran.bisnisplus.ui.component.CustomAppBar
 import com.beran.bisnisplus.ui.component.CustomDataFormField
 import com.beran.bisnisplus.ui.component.CustomImagePickerCircle
+import com.beran.bisnisplus.ui.component.ErrorView
+import com.beran.bisnisplus.ui.screen.setting.common.SettingState
+import com.beran.bisnisplus.ui.screen.setting.common.SettingStates
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
+import com.beran.core.domain.model.UserModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun EditProfileUserScreen(
+    userState: SettingState<UserModel>,
+    state: SettingStates<Unit>,
     onNavigateBack: () -> Unit,
+    fetchUserDetail: () -> Unit,
+    onUpdateProfile: (UserModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    when (userState) {
+        is SettingState.Loading -> fetchUserDetail()
+        is SettingState.Success -> {
+            EditProfileUserContent(
+                userModel = userState.data,
+                onNavigateBack = onNavigateBack,
+                onUpdateProfile = onUpdateProfile
+            )
+        }
+
+        is SettingState.Error -> {
+            ErrorView(errorText = userState.message)
+        }
+    }
+    when (state) {
+        is SettingStates.Loading -> {}
+        is SettingStates.Success -> onNavigateBack()
+        is SettingStates.Error -> {
+            ErrorView(errorText = state.message)
+        }
+
+        is SettingStates.Initial -> {}
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun EditProfileUserContent(
+    userModel: UserModel,
+    onNavigateBack: () -> Unit,
+    onUpdateProfile: (UserModel) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var imageUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+    val permissionState =
+        rememberPermissionState(permission = Manifest.permission.READ_EXTERNAL_STORAGE)
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(), onResult = { uri ->
+            imageUri = uri
+
+        })
     var name by remember {
-        mutableStateOf("")
+        mutableStateOf<String>(userModel.name.orEmpty())
     }
     var noHp by remember {
-        mutableStateOf("")
+        mutableStateOf<String>(userModel.phoneNumber.orEmpty())
     }
     var email by remember {
-        mutableStateOf("")
+        mutableStateOf<String>(userModel.email.orEmpty())
     }
-    var pekerjaan by remember {
-        mutableStateOf("")
+    var loading by remember {
+        mutableStateOf(false)
+    }
+    var errorText by remember {
+        mutableStateOf<String?>(null)
     }
 
     Scaffold(topBar = {
@@ -59,9 +124,22 @@ fun EditProfileUserScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                CustomImagePickerCircle()
+                CustomImagePickerCircle(
+                    imageUri = imageUri,
+                    onPickPhoto = {
+                        if (permissionState.hasPermission || permissionState.hasPermission) {
+                            imagePickerLauncher.launch(
+                                PickVisualMediaRequest(
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        } else {
+                            permissionState.launchPermissionRequest()
+                        }
+                    }
+                )
                 CustomDataFormField(
                     labelName = "Nama",
                     textHint = "Masukkan nama kamu",
@@ -80,21 +158,47 @@ fun EditProfileUserScreen(
                     value = email,
                     onChangeValue = { newValue -> email = newValue }
                 )
-                CustomDataFormField(
-                    labelName = "Pekerjaan",
-                    textHint = "Masukkan pekerjaan kamu",
-                    value = pekerjaan,
-                    onChangeValue = { newValue -> pekerjaan = newValue }
-                )
-                Button(
-                    onClick = { },
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(top = 30.dp)
                 ) {
-                    Text(
-                        text = stringResource(id = R.string.txt_simpan),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Button(
+                        onClick = {
+                            if (name.isNotEmpty() && email.isNotEmpty() && noHp.isNotEmpty()) {
+                                val user = userModel.copy(
+                                    name = name,
+                                    email = email,
+                                    photoUrl = imageUri.toString(),
+                                    phoneNumber = noHp
+                                )
+                                onUpdateProfile(user)
+                            } else {
+                                errorText = "Kolom data tidak boleh kosong"
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.txt_simpan),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    if (loading) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .align(Alignment.CenterEnd)
+                        ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier
+                                    .size(25.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -106,6 +210,12 @@ fun EditProfileUserScreen(
 @Composable
 fun EditProfileUserScreenPrev() {
     BisnisPlusTheme {
-        EditProfileUserScreen(onNavigateBack = {})
+        EditProfileUserScreen(
+            userState = SettingState.Loading,
+            state = SettingStates.Initial,
+            onUpdateProfile = {},
+            onNavigateBack = {},
+            fetchUserDetail = {},
+        )
     }
 }

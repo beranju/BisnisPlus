@@ -9,18 +9,15 @@ import android.provider.ContactsContract
 import androidx.annotation.RequiresApi
 import com.beran.core.domain.model.Contact
 import java.io.File
-import java.io.FileDescriptor
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
 import java.time.Instant
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+import java.util.UUID
 
 object Utils {
 
@@ -70,6 +67,10 @@ object Utils {
         inputStream.close()
         outputStream.close()
         return file.path
+    }
+
+    fun generateUUid(): String {
+        return UUID.randomUUID().toString()
     }
 
 }

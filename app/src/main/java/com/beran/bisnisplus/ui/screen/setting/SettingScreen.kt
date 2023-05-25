@@ -25,29 +25,48 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.beran.bisnisplus.R
-import com.beran.bisnisplus.ui.screen.setting.SettingViewModel
+import com.beran.bisnisplus.ui.component.ErrorView
+import com.beran.bisnisplus.ui.screen.setting.common.SettingState
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
-import org.koin.androidx.compose.koinViewModel
+import com.beran.core.domain.model.UserModel
 
 @Composable
 fun SettingScreen(
-    viewModel: SettingViewModel,
+    state: SettingState<UserModel>,
     onNavigateToEditProfile: () -> Unit,
+    fetchUserData: () -> Unit,
     signOut: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 16.dp)
+            .padding(horizontal = 16.dp, vertical = 16.dp)
     )
     {
-        ProfileCard(onNavigateToEditProfile = onNavigateToEditProfile)
+        when (state) {
+            is SettingState.Loading -> fetchUserData()
+            is SettingState.Success -> {
+                ProfileCard(
+                    state.data,
+                    onNavigateToEditProfile = onNavigateToEditProfile
+                )
+            }
+
+            is SettingState.Error -> {
+                ErrorView(errorText = state.message)
+            }
+        }
         Spacer(modifier = Modifier.height(50.dp))
         OptionMenu(
             signOut = signOut
@@ -88,7 +107,14 @@ private fun MenuItem(
 }
 
 @Composable
-private fun ProfileCard(onNavigateToEditProfile: () -> Unit, modifier: Modifier = Modifier) {
+private fun ProfileCard(
+    user: UserModel?,
+    onNavigateToEditProfile: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val painter =
+        rememberAsyncImagePainter(ImageRequest.Builder(context).data(user?.photoUrl?.toUri()).build())
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -97,17 +123,18 @@ private fun ProfileCard(onNavigateToEditProfile: () -> Unit, modifier: Modifier 
             .padding(8.dp)
     ) {
         Image(
-            painter = painterResource(id = (R.drawable.img_empty_profile)),
+            painter = if (user?.photoUrl?.isNotEmpty() == true) painter else painterResource(id = (R.drawable.img_empty_profile)),
             contentDescription = "photo profile",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = "Beranju", style = MaterialTheme.typography.titleSmall)
+            Text(text = user?.name.orEmpty(), style = MaterialTheme.typography.titleSmall)
             Text(
-                text = "Pedagang Cabai",
+                text = user?.phoneNumber.orEmpty(),
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp)
             )
             Button(
@@ -125,6 +152,10 @@ private fun ProfileCard(onNavigateToEditProfile: () -> Unit, modifier: Modifier 
 @Composable
 fun SettingScreenPrev() {
     BisnisPlusTheme {
-        SettingScreen(viewModel = koinViewModel(), onNavigateToEditProfile = {}, signOut = {})
+        SettingScreen(
+            state = SettingState.Loading,
+            onNavigateToEditProfile = {},
+            signOut = {},
+            fetchUserData = {})
     }
 }

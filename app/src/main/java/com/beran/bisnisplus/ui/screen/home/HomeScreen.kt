@@ -31,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.beran.bisnisplus.data.listDummyBuku
+import com.beran.bisnisplus.ui.component.EmptyView
 import com.beran.bisnisplus.ui.component.ErrorView
 import com.beran.bisnisplus.ui.component.FiturCepatCard
 import com.beran.bisnisplus.ui.component.PembukuanCard
@@ -60,7 +61,11 @@ fun HomeScreen(
         HomeMainCard()
         FiturCepatSection(onNavigateToCreateBook = onNavigateToCreateBook)
         when(bookState){
-            is HomeState.Loading -> fetchAllBooks()
+            is HomeState.Loading -> {
+                fetchAllBooks()
+                Timber.tag("HomeScreen").i("loadinggg, fetching data")
+                EmptyView(hintText = "Mengambil data")
+            }
             is HomeState.Success -> {
                 Timber.tag("HomeScreen").i("${bookState.data}")
                 PembukuanSection(
@@ -69,7 +74,6 @@ fun HomeScreen(
             }
             is HomeState.Error -> ErrorView(errorText = bookState.message)
         }
-        PembukuanSection(emptyList())
     }
 }
 
@@ -86,7 +90,7 @@ private fun PembukuanSection(
             style = MaterialTheme.typography.labelMedium,
         )
         Spacer(modifier = Modifier.height(8.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.height(150.dp)) {
             items(listBook, key = {it.bookId.orEmpty()}) { item ->
                 PembukuanCard(
                     judulBuku = item.category.orEmpty(),
