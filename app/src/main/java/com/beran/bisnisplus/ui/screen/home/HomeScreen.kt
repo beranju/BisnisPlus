@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.beran.bisnisplus.data.listDummyBuku
 import com.beran.bisnisplus.ui.component.EmptyView
 import com.beran.bisnisplus.ui.component.ErrorView
 import com.beran.bisnisplus.ui.component.FiturCepatCard
@@ -60,18 +59,20 @@ fun HomeScreen(
     ) {
         HomeMainCard()
         FiturCepatSection(onNavigateToCreateBook = onNavigateToCreateBook)
-        when(bookState){
+        when (bookState) {
             is HomeState.Loading -> {
                 fetchAllBooks()
                 Timber.tag("HomeScreen").i("loadinggg, fetching data")
                 EmptyView(hintText = "Mengambil data")
             }
+
             is HomeState.Success -> {
                 Timber.tag("HomeScreen").i("${bookState.data}")
                 PembukuanSection(
                     listBook = bookState.data
                 )
             }
+
             is HomeState.Error -> ErrorView(errorText = bookState.message)
         }
     }
@@ -90,13 +91,16 @@ private fun PembukuanSection(
             style = MaterialTheme.typography.labelMedium,
         )
         Spacer(modifier = Modifier.height(8.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.height(150.dp)) {
-            items(listBook, key = {it.bookId.orEmpty()}) { item ->
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.height(150.dp)
+        ) {
+            items(listBook, key = { it.bookId.orEmpty() }) { item ->
                 PembukuanCard(
                     judulBuku = item.category.orEmpty(),
                     namaAgen = item.mitra.orEmpty(),
                     jenisBuku = item.type.orEmpty(),
-                    date = Utils.convertToDate(item.createdAt?: 0)
+                    date = Utils.convertToDate(item.createdAt ?: 0)
                 )
             }
         }

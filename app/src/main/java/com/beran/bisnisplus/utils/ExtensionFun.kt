@@ -1,17 +1,25 @@
-package com.beran.core.common
+package com.beran.bisnisplus.utils
 
-import com.beran.core.domain.model.BookModel
+import android.os.Build
+import androidx.annotation.RequiresApi
+import java.time.LocalDate
+import java.time.ZoneId
+
 
 /**
- * this extension used to transform data class into map
+ * this utils used to validate email input...
+ * ...use the regular expression pattern...
+ * ...that matches the valid email
  */
-fun <T : Any> T.asMap(): Map<String, Any?> {
-    val map = mutableMapOf<String, Any?>()
-    for (field in this::class.java.declaredFields) {
-        field.isAccessible = true
-        val name = field.name
-        val value = field.get(this)
-        map[name] = value
-    }
-    return map
+fun String.isValidEmail(): Boolean {
+    val emailRegex = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\$")
+    return emailRegex.matches(this)
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun LocalDate.toEpochMilli(): Long {
+    val zoneId = ZoneId.systemDefault()
+    val zoneLocalDate = this.atStartOfDay(zoneId)
+    val instantDate = zoneLocalDate.toInstant()
+    return instantDate.toEpochMilli()
 }

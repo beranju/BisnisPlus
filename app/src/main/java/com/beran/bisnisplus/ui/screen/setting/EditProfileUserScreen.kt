@@ -41,7 +41,6 @@ import com.beran.core.domain.model.UserModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun EditProfileUserScreen(
     userState: SettingState<UserModel>,
@@ -51,29 +50,50 @@ fun EditProfileUserScreen(
     onUpdateProfile: (UserModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    Scaffold(topBar = {
+        CustomAppBar(
+            titleAppBar = "Edit Profile Anda",
+            leadingIcon = Icons.Outlined.NavigateBefore,
+            onLeadingClick = onNavigateBack
+        )
+    }) { innerPadding ->
+        Box(modifier = modifier.padding(innerPadding)) {
 
-    when (userState) {
-        is SettingState.Loading -> fetchUserDetail()
-        is SettingState.Success -> {
-            EditProfileUserContent(
-                userModel = userState.data,
-                onNavigateBack = onNavigateBack,
-                onUpdateProfile = onUpdateProfile
-            )
-        }
+            when (userState) {
+                is SettingState.Loading -> {
+                    fetchUserDetail()
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator()
+                    }
+                }
 
-        is SettingState.Error -> {
-            ErrorView(errorText = userState.message)
-        }
-    }
-    when (state) {
-        is SettingStates.Loading -> {}
-        is SettingStates.Success -> onNavigateBack()
-        is SettingStates.Error -> {
-            ErrorView(errorText = state.message)
-        }
+                is SettingState.Success -> {
+                    EditProfileUserContent(
+                        userModel = userState.data,
+                        onNavigateBack = onNavigateBack,
+                        onUpdateProfile = onUpdateProfile
+                    )
+                }
 
-        is SettingStates.Initial -> {}
+                is SettingState.Error -> {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        ErrorView(errorText = userState.message)
+                    }
+                }
+            }
+            when (state) {
+                is SettingStates.Loading -> {
+                    CircularProgressIndicator()
+                }
+
+                is SettingStates.Success -> onNavigateBack()
+                is SettingStates.Error -> {
+                    ErrorView(errorText = state.message)
+                }
+
+                is SettingStates.Initial -> {}
+            }
+        }
     }
 }
 
@@ -111,94 +131,84 @@ fun EditProfileUserContent(
         mutableStateOf<String?>(null)
     }
 
-    Scaffold(topBar = {
-        CustomAppBar(
-            titleAppBar = "Edit Profile Anda",
-            leadingIcon = Icons.Outlined.NavigateBefore,
-            onLeadingClick = onNavigateBack
-        )
-    }) { innerPadding ->
-        Box(modifier = modifier.padding(innerPadding)) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-            ) {
-                CustomImagePickerCircle(
-                    imageUri = imageUri,
-                    onPickPhoto = {
-                        if (permissionState.hasPermission || permissionState.hasPermission) {
-                            imagePickerLauncher.launch(
-                                PickVisualMediaRequest(
-                                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                                )
-                            )
-                        } else {
-                            permissionState.launchPermissionRequest()
-                        }
-                    }
-                )
-                CustomDataFormField(
-                    labelName = "Nama",
-                    textHint = "Masukkan nama kamu",
-                    value = name,
-                    onChangeValue = { newValue -> name = newValue }
-                )
-                CustomDataFormField(
-                    labelName = "No Hp",
-                    textHint = "Masukkan no hp kamu",
-                    value = noHp,
-                    onChangeValue = { newValue -> noHp = newValue }
-                )
-                CustomDataFormField(
-                    labelName = "Email",
-                    textHint = "Masukkan email kamu",
-                    value = email,
-                    onChangeValue = { newValue -> email = newValue }
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 30.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            if (name.isNotEmpty() && email.isNotEmpty() && noHp.isNotEmpty()) {
-                                val user = userModel.copy(
-                                    name = name,
-                                    email = email,
-                                    photoUrl = imageUri.toString(),
-                                    phoneNumber = noHp
-                                )
-                                onUpdateProfile(user)
-                            } else {
-                                errorText = "Kolom data tidak boleh kosong"
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.txt_simpan),
-                            style = MaterialTheme.typography.bodyMedium
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+    ) {
+        CustomImagePickerCircle(
+            imageUri = imageUri,
+            onPickPhoto = {
+                if (permissionState.hasPermission || permissionState.hasPermission) {
+                    imagePickerLauncher.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
                         )
+                    )
+                } else {
+                    permissionState.launchPermissionRequest()
+                }
+            }
+        )
+        CustomDataFormField(
+            labelName = "Nama",
+            textHint = "Masukkan nama kamu",
+            value = name,
+            onChangeValue = { newValue -> name = newValue }
+        )
+        CustomDataFormField(
+            labelName = "No Hp",
+            textHint = "Masukkan no hp kamu",
+            value = noHp,
+            onChangeValue = { newValue -> noHp = newValue }
+        )
+        CustomDataFormField(
+            labelName = "Email",
+            textHint = "Masukkan email kamu",
+            value = email,
+            onChangeValue = { newValue -> email = newValue }
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 30.dp)
+        ) {
+            Button(
+                onClick = {
+                    if (name.isNotEmpty() && email.isNotEmpty() && noHp.isNotEmpty() && imageUri != null) {
+                        val user = userModel.copy(
+                            name = name,
+                            email = email,
+                            photoUrl = imageUri.toString(),
+                            phoneNumber = noHp
+                        )
+                        onUpdateProfile(user)
+                    } else {
+                        errorText = "Kolom data tidak boleh kosong"
                     }
-                    if (loading) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
-                                .align(Alignment.CenterEnd)
-                        ) {
-                            CircularProgressIndicator(
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .size(25.dp)
-                            )
-                        }
-                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(id = R.string.txt_simpan),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            if (loading) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .align(Alignment.CenterEnd)
+                ) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .size(25.dp)
+                    )
                 }
             }
         }

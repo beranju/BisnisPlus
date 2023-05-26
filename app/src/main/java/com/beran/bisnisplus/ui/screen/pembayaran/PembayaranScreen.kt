@@ -38,7 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import com.beran.bisnisplus.data.listDummyBuku
 import com.beran.bisnisplus.ui.component.PembukuanCard
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
@@ -77,15 +76,15 @@ private fun PembayaranSection() {
         item {
             Spacer(modifier = Modifier.height(16.dp))
         }
-        items(listDummyBuku, key = { item -> item.id }) { item ->
-            PembukuanCard(
-                judulBuku = item.judulBuku,
-                namaAgen = item.agen,
-                jenisBuku = item.kategori,
-                date = item.date,
-                width = Dp.Infinity
-            )
-        }
+//        items(listDummyBuku, key = { item -> item.id }) { item ->
+//            PembukuanCard(
+//                judulBuku = item.judulBuku,
+//                namaAgen = item.agen,
+//                jenisBuku = item.kategori,
+//                date = item.date,
+//                width = Dp.Infinity
+//            )
+//        }
     }
 }
 

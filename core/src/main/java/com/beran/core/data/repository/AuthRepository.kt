@@ -3,7 +3,6 @@ package com.beran.core.data.repository
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import android.net.Uri
 import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -29,7 +28,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.asDeferred
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 
 private val Context.onBoardSession: DataStore<Preferences> by preferencesDataStore(Constant.onBoard)
@@ -167,18 +168,28 @@ class AuthRepository(
     override fun updateProfile(userModel: UserModel): Flow<Resource<Unit>> = flow {
         emit(Resource.Loading)
         try {
+            /**
+             * The withContext(Dispatchers.IO) block is used to perform the image upload...
+             * ...and Firestore update operations concurrently. This utilizes the IO dispatcher,...
+             * ...which is optimized for performing IO-bound tasks.
+             */
             val storageRef = storage.reference
-            val imgUrl: Uri? = if (userModel.photoUrl?.isNotEmpty() == true)
-                storageRef.child(userModel.uid.toString()).putFile(userModel.uid?.toUri()!!)
+            val imgUrl = withContext(Dispatchers.IO) {
+                storageRef.child(userModel.uid.toString()).putFile(userModel.photoUrl?.toUri()!!)
                     .await().storage.downloadUrl.await()
-            else null
-            val updatedData = userModel.copy(photoUrl = imgUrl.toString())
+            }
+            val updatedData: UserModel = userModel.copy(photoUrl = imgUrl.toString())
             val dataAsMap = updatedData.asMap()
-            val userQuerySnapshot =
+            // ** Deferred is used to asynchronously await the userQuerySnapshot result.
+            val userQuerySnapshotDeffered = withContext(Dispatchers.IO) {
                 fireStore.collection(Constant.userRef).whereEqualTo("uid", userModel.uid).get()
-                    .await()
+                    .asDeferred()
+            }
+            val userQuerySnapshot = userQuerySnapshotDeffered.await()
             val userDocId: String = userQuerySnapshot.documents.map { it.id }.first()
-            fireStore.collection(Constant.userRef).document(userDocId).update(dataAsMap).await()
+            withContext(Dispatchers.IO) {
+                fireStore.collection(Constant.userRef).document(userDocId).update(dataAsMap).await()
+            }
             emit(Resource.Success(Unit))
         } catch (e: Exception) {
             e.printStackTrace()

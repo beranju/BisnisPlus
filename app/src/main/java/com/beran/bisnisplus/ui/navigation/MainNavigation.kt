@@ -32,6 +32,7 @@ import com.beran.bisnisplus.ui.screen.pembukuan.edit.EditBookViewModel
 import com.beran.bisnisplus.ui.screen.pembukuan.report.FinancialReportViewModel
 import com.beran.bisnisplus.ui.screen.setting.EditProfileUserScreen
 import com.beran.bisnisplus.ui.screen.setting.common.SettingViewModel
+import com.beran.bisnisplus.ui.screen.statistic.StatisticViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -137,7 +138,12 @@ fun MainNavigation(
                 )
             }
             composable(route = MainScreen.Statistik.route) {
-                StatistikScreen()
+                val viewmodel = koinViewModel<StatisticViewModel>()
+                val state = viewmodel.state.value
+                StatistikScreen(
+                    state = state,
+                    fetchData = { viewmodel.fetchData() }
+                )
             }
             composable(route = MainScreen.Pembayaran.route) {
                 PembayaranScreen(
