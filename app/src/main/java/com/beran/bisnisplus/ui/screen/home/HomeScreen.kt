@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.InsertChart
 import androidx.compose.material.icons.outlined.NavigateNext
 import androidx.compose.material.icons.outlined.StickyNote2
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,6 +37,7 @@ import com.beran.bisnisplus.ui.component.FiturCepatCard
 import com.beran.bisnisplus.ui.component.PembukuanCard
 import com.beran.bisnisplus.ui.component.ProgressCard
 import com.beran.bisnisplus.ui.screen.home.common.HomeState
+import com.beran.bisnisplus.ui.screen.home.common.HomeStates
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import com.beran.core.domain.model.BookModel
 import com.beran.core.utils.Utils
@@ -44,6 +46,7 @@ import timber.log.Timber
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
+    state: HomeStates,
     bookState: HomeState<List<BookModel>>,
     onNavigateToCreateBook: () -> Unit,
     fetchAllBooks: () -> Unit,
@@ -59,35 +62,45 @@ fun HomeScreen(
     ) {
         HomeMainCard()
         FiturCepatSection(onNavigateToCreateBook = onNavigateToCreateBook)
-        when (bookState) {
-            is HomeState.Loading -> {
-                fetchAllBooks()
-                Timber.tag("HomeScreen").i("loadinggg, fetching data")
-                EmptyView(hintText = "Mengambil data")
-            }
-
-            is HomeState.Success -> {
-                Timber.tag("HomeScreen").i("${bookState.data}")
-                PembukuanSection(
-                    listBook = bookState.data
-                )
-            }
-
-            is HomeState.Error -> ErrorView(errorText = bookState.message)
+        if (state.isLoading){
+            fetchAllBooks()
+            CircularProgressIndicator()
+        }else if(state.error?.isNotEmpty() == true){
+            ErrorView(errorText = state.error)
+        }else{
+            Timber.tag("homescreen").i("data: ${state.listBook}")
+            PembukuanSection(listBook = state.listBook, title = "dataclass pembukuan")
         }
+//        when (bookState) {
+//            is HomeState.Loading -> {
+//                fetchAllBooks()
+//                Timber.tag("HomeScreen").i("loadinggg, fetching data")
+//                EmptyView(hintText = "Mengambil data")
+//            }
+//
+//            is HomeState.Success -> {
+//                Timber.tag("HomeScreen").i("${bookState.data}")
+//                PembukuanSection(
+//                    listBook = bookState.data, title = "Sealed Pembukuan"
+//                )
+//            }
+//
+//            is HomeState.Error -> ErrorView(errorText = bookState.message)
+//        }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun PembukuanSection(
+    title: String,
     listBook: List<BookModel>,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Pembukuan",
+            text = title,
             style = MaterialTheme.typography.labelMedium,
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -182,6 +195,7 @@ fun HomeMainCard() {
 fun HomeScreenPrev() {
     BisnisPlusTheme {
         HomeScreen(
+            state = HomeStates(),
             onNavigateToCreateBook = {},
             fetchAllBooks = {},
             bookState = HomeState.Loading

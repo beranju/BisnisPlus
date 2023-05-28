@@ -81,14 +81,16 @@ fun MainNavigation(
         ) {
             composable(route = MainScreen.Home.route) {
                 val viewModel = koinViewModel<HomeViewModel>()
-                val state = viewModel.listBook.collectAsStateWithLifecycle().value
+                val listBook = viewModel.listBook.collectAsStateWithLifecycle().value
+                val state = viewModel.state.value
                 HomeScreen(
-                    bookState = state,
+                    state = state,
+                    bookState = listBook,
                     onNavigateToCreateBook = {
                         navController.navigate(MainScreen.CreateNewRecord.route)
                     },
                     fetchAllBooks = {
-                        viewModel.fetchListBook()
+                        viewModel.fetchBook()
                     }
                 )
             }
