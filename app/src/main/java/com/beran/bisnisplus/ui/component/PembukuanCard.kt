@@ -26,7 +26,7 @@ import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 @Composable
 fun PembukuanCard(
     judulBuku: String,
-    namaAgen: String,
+    amount: String,
     jenisBuku: String,
     date: String,
     width : Dp = 250.dp,
@@ -45,12 +45,12 @@ fun PembukuanCard(
             modifier = Modifier.fillMaxWidth()
         )
         Text(
-            text = namaAgen,
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 10.sp)
+            text = judulBuku,
+            style = MaterialTheme.typography.bodySmall
         )
         Text(
-            text = judulBuku,
-            style = MaterialTheme.typography.bodyLarge,
+            text = amount,
+            style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.primary
         )
         Text(

@@ -58,4 +58,7 @@ dependencies {
     // ** opencsv -> collection to .csv
     implementation 'com.opencsv:opencsv:5.5.2'
 
+    // ** midtrans sandbox
+    implementation 'com.midtrans:uikit:2.0.0-SANDBOX'
+
 }

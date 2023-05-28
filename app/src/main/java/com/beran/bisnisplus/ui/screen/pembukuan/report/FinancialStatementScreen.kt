@@ -41,6 +41,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -57,7 +58,6 @@ import com.beran.core.domain.model.BookModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import timber.log.Timber
-import java.io.File
 
 @OptIn(ExperimentalPermissionsApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -87,7 +87,7 @@ fun FinancialStatementScreen(
         contract = CreateDocument("text/csv"),
         onResult = { uri ->
             uri?.let {
-                filePath = Utils.getFileFromUri(context,uri)
+                filePath = Utils.getFileFromUri(context, uri)
                 filePath?.let {
                     exportDataIntoCsv(it)
                 }
@@ -100,6 +100,7 @@ fun FinancialStatementScreen(
         is BookStates.Success -> {
             Timber.tag("Financial").i(" convert Success")
         }
+
         is BookStates.Error -> Timber.tag("Financial").i("Error: ${uiState.message}")
     }
 
@@ -239,7 +240,7 @@ private fun ListBookSection(
 }
 
 @Composable
-private fun BookItem(
+fun BookItem(
     category: String,
     date: String,
     amount: String,
@@ -281,17 +282,24 @@ private fun BookItem(
             ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(3f)
                 ) {
-                    Text(text = category, style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = category,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleSmall
+                    )
                     Text(text = date, style = MaterialTheme.typography.bodySmall)
                 }
-                Text(text = amount, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = amount,
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.weight(2f)
+                )
 
             }
         }
     }
-
 }
 
 @Composable

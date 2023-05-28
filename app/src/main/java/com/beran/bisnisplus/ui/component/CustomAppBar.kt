@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,7 +27,7 @@ import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 fun CustomAppBar(
     titleAppBar: String,
     onLeadingClick: () -> Unit,
-    leadingIcon: ImageVector = Icons.Outlined.Menu,
+    leadingIcon: ImageVector? = null,
     showTrailingIcon: Boolean = false
 ) {
     Row(
@@ -37,7 +38,9 @@ fun CustomAppBar(
             .height(85.dp)
             .padding(horizontal = 16.dp)
     ) {
-        Icon(imageVector = leadingIcon, contentDescription = "Menu", modifier = Modifier.clickable { onLeadingClick() })
+        if (leadingIcon != null){
+            Icon(imageVector = leadingIcon, contentDescription = "Menu", modifier = Modifier.clickable { onLeadingClick() })
+        }
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = titleAppBar,
@@ -45,8 +48,8 @@ fun CustomAppBar(
             modifier = Modifier.weight(1f)
         )
         if (showTrailingIcon) Icon(
-            imageVector = Icons.Outlined.AccountCircle,
-            contentDescription = "Avatar icon"
+            imageVector = Icons.Outlined.Notifications,
+            contentDescription = "Notification icon"
         )
     }
 
