@@ -6,16 +6,19 @@ import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.provider.ContactsContract
-import androidx.annotation.RequiresApi
 import com.beran.core.domain.model.Contact
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.TextStyle
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import java.util.UUID
 
@@ -26,15 +29,21 @@ object Utils {
         return formatter.format(amount)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun convertToDate(epoch: Long): String{
-        val instant = Instant.ofEpochMilli(epoch)
-        val localDate = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-        val dayOfWeekName = localDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
-        val monthName = localDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
-        val dayOfMonth = localDate.dayOfMonth
-        val year = localDate.year
-        return "$dayOfWeekName, $dayOfMonth $monthName $year"
+    fun convertToDate(epoch: Long): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val instant = Instant.ofEpochMilli(epoch)
+            val localDate = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+            val dayOfWeekName =
+                localDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+            val monthName = localDate.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+            val dayOfMonth = localDate.dayOfMonth
+            val year = localDate.year
+            "$dayOfWeekName, $dayOfMonth $monthName $year"
+        } else {
+            val date = Date(epoch)
+            val dateFormat = SimpleDateFormat("EEEE,d MMMM yyyy", Locale.getDefault())
+            dateFormat.format(date)
+        }
     }
 
     fun getContacts(contactUri: Uri?, contentResolver: ContentResolver): Contact? {
@@ -49,13 +58,13 @@ object Utils {
                 return Contact(contactName, contactPhone?.toInt())
             }
         }
-
         return null
     }
 
     fun getFileFromUri(context: Context, uri: Uri): String? {
         val contentResolver = context.contentResolver
-        val parcelFileDescriptor : ParcelFileDescriptor? = contentResolver.openFileDescriptor(uri, "r")
+        val parcelFileDescriptor: ParcelFileDescriptor? =
+            contentResolver.openFileDescriptor(uri, "r")
         val fileDescriptor = parcelFileDescriptor?.fileDescriptor
 
         val file = File(context.cacheDir, "temp.file")

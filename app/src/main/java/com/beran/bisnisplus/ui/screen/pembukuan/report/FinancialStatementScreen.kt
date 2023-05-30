@@ -60,7 +60,6 @@ import com.google.accompanist.permissions.rememberPermissionState
 import timber.log.Timber
 
 @OptIn(ExperimentalPermissionsApi::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun FinancialStatementScreen(
     state: BookStates<List<BookModel>>,
@@ -172,7 +171,6 @@ fun FinancialStatementScreen(
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun FinancialStatementContent(
     listBook: List<BookModel>,
@@ -204,7 +202,6 @@ fun FinancialStatementContent(
 
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun ListBookSection(
     listBook: List<BookModel>,
@@ -408,7 +405,6 @@ private fun CustomCard(
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 private fun FinancialStatementScreenPrev() {

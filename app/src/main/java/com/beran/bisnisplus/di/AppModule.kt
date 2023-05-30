@@ -3,7 +3,7 @@ package com.beran.bisnisplus.di
 import com.beran.bisnisplus.ui.screen.auth.dataBisnis.BisnisViewModel
 import com.beran.bisnisplus.ui.screen.auth.signUp.SignUpViewModel
 import com.beran.bisnisplus.ui.screen.auth.signin.SignInViewModel
-import com.beran.bisnisplus.ui.screen.home.common.HomeViewModel
+import com.beran.bisnisplus.ui.screen.home.HomeViewModel
 import com.beran.bisnisplus.ui.screen.onboarding.OnBoardViewModel
 import com.beran.bisnisplus.ui.screen.pembukuan.BookViewModel
 import com.beran.bisnisplus.ui.screen.pembukuan.create.CreateBookViewModel
@@ -40,11 +40,10 @@ val viewModelModule = module {
     viewModel { SettingViewModel(get()) }
     viewModel { StatisticViewModel(get()) }
     viewModel { OnBoardViewModel(get()) }
-    viewModel { HomeViewModel(get()) }
     viewModel { BisnisViewModel(get(), get()) }
 }
 val homeModelModule = module {
-    viewModel { HomeViewModel(get()) }
+    viewModel { HomeViewModel(get(), get()) }
 }
 
 val bookViewModelModule = module {

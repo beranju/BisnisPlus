@@ -3,9 +3,12 @@ package com.beran.bisnisplus.ui.navigation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material.Scaffold
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -21,7 +24,8 @@ import com.beran.bisnisplus.ui.screen.HomeScreen
 import com.beran.bisnisplus.ui.screen.PembayaranScreen
 import com.beran.bisnisplus.ui.screen.SettingScreen
 import com.beran.bisnisplus.ui.screen.StatistikScreen
-import com.beran.bisnisplus.ui.screen.home.common.HomeViewModel
+import com.beran.bisnisplus.ui.screen.home.HomeViewModel
+import com.beran.bisnisplus.ui.screen.notification.NotificationScreen
 import com.beran.bisnisplus.ui.screen.pembayaran.CreateNewPaymentScreen
 import com.beran.bisnisplus.ui.screen.pembukuan.BookViewModel
 import com.beran.bisnisplus.ui.screen.pembukuan.CreateNewRecordScreen
@@ -29,42 +33,41 @@ import com.beran.bisnisplus.ui.screen.pembukuan.EditBookRecordScreen
 import com.beran.bisnisplus.ui.screen.pembukuan.component.FinancialStatementScreen
 import com.beran.bisnisplus.ui.screen.pembukuan.create.CreateBookViewModel
 import com.beran.bisnisplus.ui.screen.pembukuan.edit.EditBookViewModel
+import com.beran.bisnisplus.ui.screen.pembukuan.list.SortedBookScreen
 import com.beran.bisnisplus.ui.screen.pembukuan.report.FinancialReportViewModel
 import com.beran.bisnisplus.ui.screen.setting.EditProfileUserScreen
 import com.beran.bisnisplus.ui.screen.setting.common.SettingViewModel
 import com.beran.bisnisplus.ui.screen.statistic.StatisticViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainNavigation(
     navController: NavHostController,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
     logOut: () -> Unit,
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination?.route
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
-            when (currentDestination) {
-                MainScreen.Home.route -> CustomAppBar(titleAppBar = "Bisnis Plus",
+            if (currentDestination == MainScreen.Home.route || currentDestination == MainScreen.Pembukuan.route || currentDestination == MainScreen.Statistik.route || currentDestination == MainScreen.Pembayaran.route || currentDestination == MainScreen.Setting.route) {
+                CustomAppBar(
+                    titleAppBar = when (currentDestination) {
+                        MainScreen.Home.route -> "Bisnis Plus"
+                        MainScreen.Pembukuan.route -> "Pembukuan"
+                        MainScreen.Statistik.route -> "Statistik"
+                        MainScreen.Pembayaran.route -> "Pembayaran"
+                        MainScreen.Setting.route -> "Setting"
+                        else -> ""
+                    },
                     showTrailingIcon = true,
-                    onLeadingClick = {})
-
-                MainScreen.Pembukuan.route -> CustomAppBar(
-                    titleAppBar = "Pembukuan",
-                    onLeadingClick = {})
-
-                MainScreen.Statistik.route -> CustomAppBar(
-                    titleAppBar = "Statistik",
-                    onLeadingClick = {})
-
-                MainScreen.Pembayaran.route -> CustomAppBar(
-                    titleAppBar = "Pembayaran",
-                    onLeadingClick = {})
-
-                MainScreen.Setting.route -> CustomAppBar(
-                    titleAppBar = "Setting",
-                    onLeadingClick = {})
+                    onTrailingClick = { navController.navigate(MainScreen.Notification.route) }
+                )
             }
         },
         bottomBar = {
@@ -81,14 +84,39 @@ fun MainNavigation(
         ) {
             composable(route = MainScreen.Home.route) {
                 val viewModel = koinViewModel<HomeViewModel>()
+                val scope = rememberCoroutineScope()
                 val state = viewModel.state.value
                 HomeScreen(
                     state = state,
+                    scaffoldState = scaffoldState,
                     onNavigateToCreateBook = {
                         navController.navigate(MainScreen.CreateNewRecord.route)
                     },
-                    fetchAllBooks = {
-                        viewModel.fetchBook()
+                    onNavigateToProfile = {
+                        navController.navigate(MainScreen.Setting.route)
+                    },
+                    fetching = {
+                        // ** menjalan fungsi secara bersamaan
+                        scope.launch {
+                            val fetchUserDeferred = async { viewModel.fetchUser() }
+                            val fetchBookDeferred = async { viewModel.fetchBook() }
+                            awaitAll(fetchUserDeferred, fetchBookDeferred)
+                        }
+                    },
+                    onNavigateToStatistic = {
+                        navController.navigate(MainScreen.Statistik.route)
+                    },
+                    onNavigateToEdit = { id ->
+                        navController.navigate(MainScreen.EditBookRecord.createRoute(id))
+                    },
+                    deleteBook = { id ->
+                        viewModel.deleteBook(id)
+                    },
+                    onNavigateToDebt = {
+                        navController.navigate(MainScreen.SortedBook.route)
+                    },
+                    checkNetworkAvailable = {
+                        viewModel.checkNetworkAvailable(it)
                     }
                 )
             }
@@ -136,6 +164,9 @@ fun MainNavigation(
                         viewModel.fetchBookById(bookId!!)
                     },
                 )
+            }
+            composable(route = MainScreen.SortedBook.route){
+                SortedBookScreen()
             }
             composable(route = MainScreen.Statistik.route) {
                 val viewmodel = koinViewModel<StatisticViewModel>()
@@ -244,6 +275,9 @@ fun MainNavigation(
                         viewModel.fetchBookById(bookId!!)
                     },
                 )
+            }
+            composable(MainScreen.Notification.route) {
+                NotificationScreen()
             }
         }
     }

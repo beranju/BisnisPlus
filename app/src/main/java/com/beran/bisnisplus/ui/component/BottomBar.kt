@@ -3,12 +3,6 @@ package com.beran.bisnisplus.ui.component
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material.icons.outlined.CreditCard
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.ListAlt
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,34 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.beran.bisnisplus.ui.navigation.MainScreen
-import com.beran.bisnisplus.ui.navigation.NavigationItem
+import com.beran.bisnisplus.ui.navigation.navigationItem
 
 @Composable
 fun BottomBar(navController: NavHostController, modifier: Modifier = Modifier) {
-    val navigationItem = listOf(
-        NavigationItem(title = "Home", icon = Icons.Outlined.Home, screen = MainScreen.Home),
-        NavigationItem(
-            title = "Buku",
-            icon = Icons.Outlined.ListAlt,
-            screen = MainScreen.Pembukuan
-        ),
-        NavigationItem(
-            title = "Statistik",
-            icon = Icons.Outlined.Analytics,
-            screen = MainScreen.Statistik
-        ),
-        NavigationItem(
-            title = "Tagihan",
-            icon = Icons.Outlined.CreditCard,
-            screen = MainScreen.Pembayaran
-        ),
-        NavigationItem(
-            title = "Setting",
-            icon = Icons.Outlined.Settings,
-            screen = MainScreen.Setting
-        ),
-    )
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
 

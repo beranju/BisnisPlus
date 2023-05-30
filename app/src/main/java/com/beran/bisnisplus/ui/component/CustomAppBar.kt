@@ -9,11 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,31 +25,46 @@ import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 @Composable
 fun CustomAppBar(
     titleAppBar: String,
-    onLeadingClick: () -> Unit,
+    onLeadingClick: (() -> Unit)? = null,
+    onTrailingClick: (() -> Unit)? = null,
     leadingIcon: ImageVector? = null,
     showTrailingIcon: Boolean = false
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(85.dp)
-            .padding(horizontal = 16.dp)
-    ) {
-        if (leadingIcon != null){
-            Icon(imageVector = leadingIcon, contentDescription = "Menu", modifier = Modifier.clickable { onLeadingClick() })
+    Surface(shadowElevation = 2.dp, color = MaterialTheme.colorScheme.background) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+                .padding(horizontal = 16.dp)
+        ) {
+            if (leadingIcon != null) {
+                Icon(
+                    imageVector = leadingIcon,
+                    contentDescription = "Menu",
+                    modifier = Modifier.clickable {
+                        if (onLeadingClick != null) {
+                            onLeadingClick()
+                        }
+                    })
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = titleAppBar,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.weight(1f)
+            )
+            if (showTrailingIcon) Icon(
+                imageVector = Icons.Outlined.Notifications,
+                contentDescription = "Notification icon",
+                modifier = Modifier.clickable {
+                    if (onTrailingClick != null) {
+                        onTrailingClick()
+                    }
+                }
+            )
         }
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            text = titleAppBar,
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.weight(1f)
-        )
-        if (showTrailingIcon) Icon(
-            imageVector = Icons.Outlined.Notifications,
-            contentDescription = "Notification icon"
-        )
     }
 
 }
@@ -59,6 +73,11 @@ fun CustomAppBar(
 @Composable
 fun CustomAppBarPrev() {
     BisnisPlusTheme {
-        CustomAppBar(titleAppBar = "Bisnis Plus", onLeadingClick = {}, showTrailingIcon = true)
+        CustomAppBar(
+            titleAppBar = "Bisnis Plus",
+            onLeadingClick = {},
+            onTrailingClick = {},
+            showTrailingIcon = true
+        )
     }
 }

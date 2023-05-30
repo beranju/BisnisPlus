@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,33 +29,32 @@ import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 
 @Composable
 fun FiturCepatCard(
-    onNavigateToCreateBook: () -> Unit,
+    action: () -> Unit,
     title: String,
     icon: ImageVector
 ) {
     Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
-            .width(100.dp)
-            .height(60.dp)
+            .width(70.dp)
+            .height(70.dp)
             .clip(RoundedCornerShape(10.dp))
             .background(MaterialTheme.colorScheme.tertiaryContainer)
             .clickable {
-                onNavigateToCreateBook()
+                action()
             }
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
+        Column(
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(12.dp)
         ) {
             Icon(imageVector = icon, contentDescription = null)
-            Spacer(modifier = Modifier.width(2.dp))
             Text(
                 text = title,
-                style = MaterialTheme.typography.labelSmall.copy(lineHeight = 10.sp),
-                modifier = Modifier.weight(1f)
+                style = MaterialTheme.typography.labelSmall,
             )
         }
     }
@@ -64,6 +64,6 @@ fun FiturCepatCard(
 @Composable
 fun FiturCepatCardPrev() {
     BisnisPlusTheme {
-        FiturCepatCard(onNavigateToCreateBook = {},"Buat Buku", Icons.Outlined.StickyNote2)
+        FiturCepatCard(action = {},"Buat Buku", Icons.Outlined.StickyNote2)
     }
 }

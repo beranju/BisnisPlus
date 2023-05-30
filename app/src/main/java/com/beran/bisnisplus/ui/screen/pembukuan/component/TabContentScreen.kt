@@ -104,7 +104,6 @@ private fun ListBookSection(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 private fun DateSection(
     date: Long?, modifier: Modifier = Modifier
