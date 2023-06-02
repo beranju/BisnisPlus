@@ -10,8 +10,6 @@ interface BisnisUseCase {
     ): Flow<Resource<Unit>>
 
     fun editBisnisData(
-        bisnisName: String,
-        bisnisCategory: String,
-        commodity: String
+        businessModel: BusinessModel
     ): Flow<Resource<Unit>>
 }

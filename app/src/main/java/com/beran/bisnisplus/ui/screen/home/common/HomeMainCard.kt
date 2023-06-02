@@ -46,9 +46,7 @@ fun HomeMainCard(
                     .padding(16.dp)
             ) {
                 HomeProfileCard(
-                    photoUrl = user?.photoUrl.orEmpty(),
-                    username = user?.name.orEmpty(),
-                    phoneNumber = user?.phoneNumber.orEmpty(),
+                    user = user,
                     onNavigateToProfile = onNavigateToProfile
                 )
                 Divider()

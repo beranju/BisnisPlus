@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.beran.bisnisplus.ui.screen.pembukuan.component.BooksCard
+import com.beran.bisnisplus.ui.screen.pembukuan.component.ListBookShimmer
 import com.beran.bisnisplus.utils.Utils
 import com.beran.bisnisplus.utils.Utils.convertToDate
 import com.beran.core.domain.model.BookModel
@@ -38,6 +39,7 @@ import com.beran.core.domain.model.BookModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TabContentScreen(
+    isLoading : Boolean,
     listBook: List<Pair<Long?, List<BookModel>>>,
     onNavigateToEdit: (String) -> Unit,
     deleteBook: (String) -> Unit,
@@ -52,17 +54,20 @@ fun TabContentScreen(
         .onGloballyPositioned { coordinate ->
             size = coordinate.size.toSize()
         }) {
-        ListBookSection(
-            size = size,
-            listBook = listBook,
-            onNavigateToEdit = onNavigateToEdit,
-            deleteBook = deleteBook
-        )
-
+        if (isLoading){
+            ListBookShimmer()
+        }else{
+            ListBookSection(
+                size = size,
+                listBook = listBook,
+                onNavigateToEdit = onNavigateToEdit,
+                deleteBook = deleteBook
+            )
+        }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ListBookSection(
@@ -118,12 +123,3 @@ private fun DateSection(
         Text(text = dateString, style = MaterialTheme.typography.bodySmall)
     }
 }
-//
-//@RequiresApi(Build.VERSION_CODES.O)
-//@Preview(showBackground = true)
-//@Composable
-//fun TabContentScreenPrev() {
-//    BisnisPlusTheme {
-//        TabContentScreen(emptyList(), onNavigateToEdit = {})
-//    }
-//}

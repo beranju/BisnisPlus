@@ -1,33 +1,34 @@
 package com.beran.bisnisplus.ui.screen.pembukuan.edit
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.beran.bisnisplus.ui.screen.pembukuan.BookStates
+import com.beran.bisnisplus.ui.screen.pembukuan.BooksState
 import com.beran.core.common.Resource
 import com.beran.core.domain.model.BookModel
 import com.beran.core.domain.usecase.book.BookUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class EditBookViewModel(private val useCase: BookUseCase) : ViewModel() {
 
-    private var _uiState: MutableStateFlow<BookStates<Unit>> =
-        MutableStateFlow(BookStates.Loading)
-    val uiState get() = _uiState.asStateFlow()
-
-    private var _book: MutableStateFlow<BookStates<BookModel>> =
-        MutableStateFlow(BookStates.Loading)
-    val book get() = _book.asStateFlow()
-
+    private var _state: MutableState<BooksState> = mutableStateOf(BooksState())
+    val state: State<BooksState> get() = _state
     fun fetchBookById(bookId: String) {
         viewModelScope.launch {
             useCase.fetchBookById(bookId)
                 .collect { result ->
                     when (result) {
-                        is Resource.Loading -> _book.value = BookStates.Loading
-                        is Resource.Error -> _book.value = BookStates.Error(result.message)
-                        is Resource.Success -> _book.value = BookStates.Success(result.data)
+                        is Resource.Loading -> _state.value =
+                            _state.value.copy(isLoading = true, error = null)
+
+                        is Resource.Error -> _state.value =
+                            _state.value.copy(isLoading = false, error = result.message)
+
+                        is Resource.Success -> _state.value =
+                            _state.value.copy(isLoading = false, book = result.data)
                     }
                 }
         }
@@ -38,11 +39,21 @@ class EditBookViewModel(private val useCase: BookUseCase) : ViewModel() {
         viewModelScope.launch {
             useCase.updateBook(bookModel).collect { result ->
                 when (result) {
-                    is Resource.Loading -> _uiState.value = BookStates.Loading
-                    is Resource.Error -> _uiState.value = BookStates.Error(result.message)
-                    is Resource.Success -> _uiState.value = BookStates.Success(result.data)
+                    is Resource.Loading -> _state.value =
+                        _state.value.copy(isLoading = true, error = null)
+
+                    is Resource.Error -> _state.value =
+                        _state.value.copy(isLoading = false, error = result.message)
+
+                    is Resource.Success -> _state.value =
+                        _state.value.copy(isLoading = false, isSuccess = true)
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.cancel()
     }
 }

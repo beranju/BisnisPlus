@@ -40,6 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -83,11 +84,28 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CreateNewRecordScreen(
-    state: BookState<Unit>,
+    state: BooksState,
     onCreateNewBook: (BookModel) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var isLoading by remember {
+        mutableStateOf(state.isLoading)
+    }
+    var error by remember {
+        mutableStateOf<String?>(null)
+    }
+    LaunchedEffect(key1 = state.isSuccess) {
+        if (state.isSuccess) {
+            onNavigateBack()
+        }
+    }
+    LaunchedEffect(key1 = state.isLoading) {
+        isLoading = state.isLoading
+    }
+    LaunchedEffect(key1 = state.error?.isNotEmpty()) {
+        error = state.error
+    }
 
     val scrollState = rememberScrollState()
 
@@ -104,29 +122,12 @@ fun CreateNewRecordScreen(
                 .padding(innerPadding)
                 .verticalScroll(scrollState)
         ) {
-            when (state) {
-                is BookState.Initial -> {
-                    CreateNewRecordContent(
-                        onCreateNewBook = onCreateNewBook,
-                        onNavigateBack = onNavigateBack, modifier = modifier
-                    )
-                }
-
-                is BookState.Loading -> {}
-                is BookState.Error -> {
-                    Box(
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .background(MaterialTheme.colorScheme.background),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = state.message)
-                    }
-                }
-
-                is BookState.Success -> onNavigateBack()
-            }
-
+            CreateNewRecordContent(
+                isLoading = isLoading,
+                error = error,
+                onChangeError = { error = it },
+                onCreateNewBook = onCreateNewBook, modifier = modifier
+            )
         }
     }
 
@@ -136,9 +137,11 @@ fun CreateNewRecordScreen(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CreateNewRecordContent(
+    isLoading: Boolean,
     onCreateNewBook: (BookModel) -> Unit,
-    onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    onChangeError: (String?) -> Unit,
+    modifier: Modifier = Modifier,
+    error: String? = null
 ) {
     val context = LocalContext.current
     val permissionState = rememberPermissionState(Manifest.permission.READ_CONTACTS)
@@ -171,12 +174,6 @@ fun CreateNewRecordContent(
     var note by remember {
         mutableStateOf("")
     }
-    var loading by remember {
-        mutableStateOf(false)
-    }
-    var errorText by remember {
-        mutableStateOf<String?>(null)
-    }
     var selectedDate by remember {
         mutableStateOf<LocalDate>(LocalDate.now())
     }
@@ -194,7 +191,7 @@ fun CreateNewRecordContent(
             if (result.resultCode == Activity.RESULT_OK) {
                 val contactUri: Uri? = result.data?.data
                 val contact = Utils.getContacts(contactUri, context.contentResolver)
-                val name: String = contact?.contactName ?: "Joko"
+                val name: String = contact?.contactName.orEmpty()
                 mitraName = name
             }
         }
@@ -203,9 +200,9 @@ fun CreateNewRecordContent(
 
     Column(
         modifier = modifier
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        if (errorText != null) {
+        if (error != null) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -214,7 +211,7 @@ fun CreateNewRecordContent(
                     .padding(vertical = 4.dp, horizontal = 6.dp)
             ) {
                 Text(
-                    text = errorText.orEmpty(),
+                    text = error.orEmpty(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onErrorContainer
                 )
@@ -287,7 +284,6 @@ fun CreateNewRecordContent(
                 onCalendarSelection = { newDate ->
                     selectedDate = newDate
                 },
-                selectedDate = selectedDate,
                 onGetContact = {
                     if (permissionState.hasPermission) {
                         pickContactLauncher.launch(contactIntent)
@@ -326,7 +322,7 @@ fun CreateNewRecordContent(
                             )
                             onCreateNewBook(bookModel)
                         } else {
-                            errorText = "Stok dan nama mitra tidak boleh kosong"
+                            onChangeError("Stok dan nama mitra tidak boleh kosong")
                         }
 
                     } else {
@@ -345,18 +341,18 @@ fun CreateNewRecordContent(
                             )
                             onCreateNewBook(bookModel)
                         } else {
-                            errorText = "Jumlah tidak boleh kosong"
+                            onChangeError("Jumlah tidak boleh kosong")
                         }
                     }
                 } else {
-                    errorText = "Kategori tidak boleh kosong"
+                    onChangeError("Kategori tidak boleh kosong")
                 }
 
-            }, enabled = !loading, modifier = Modifier.fillMaxWidth()) {
+            }, enabled = !isLoading, modifier = Modifier.fillMaxWidth()) {
                 Text(text = "Tambahkan")
             }
-            if (loading) {
-                errorText = null
+            if (isLoading) {
+                onChangeError(null)
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -471,7 +467,6 @@ fun OptionalFormSection(
     mitraName: String,
     onChangeMitraName: (String) -> Unit,
     date: String,
-    selectedDate: LocalDate,
     onCalendarSelection: (LocalDate) -> Unit,
     onChangeDate: (String) -> Unit,
     note: String,
@@ -716,7 +711,7 @@ fun BookTypeBadge(
 fun CreateNewRecordScreenPrev() {
     BisnisPlusTheme {
         CreateNewRecordScreen(
-            state = BookState.Initial,
+            state = BooksState(),
             onCreateNewBook = {},
             onNavigateBack = {},
         )

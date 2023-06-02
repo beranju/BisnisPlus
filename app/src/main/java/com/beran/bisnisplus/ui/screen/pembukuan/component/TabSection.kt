@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BookTabsSection(
+    isLoading : Boolean,
     incomeList: List<Pair<Long?, List<BookModel>>>,
     expenseList: List<Pair<Long?, List<BookModel>>>,
     onNavigateToEdit: (String) -> Unit,
@@ -53,6 +54,7 @@ fun BookTabsSection(
         Spacer(modifier = Modifier.height(16.dp))
         Tabs(pagerState = pagerState)
         TabsContent(
+            isLoading = isLoading,
             pagerState = pagerState,
             incomeList = incomeList,
             expenseList = expenseList,
@@ -66,6 +68,7 @@ fun BookTabsSection(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun TabsContent(
+    isLoading : Boolean,
     incomeList: List<Pair<Long?, List<BookModel>>>,
     expenseList: List<Pair<Long?, List<BookModel>>>,
     onNavigateToEdit: (String) -> Unit,
@@ -80,6 +83,7 @@ private fun TabsContent(
                         EmptyView(hintText = "Mulai catat pemasukan anda")
                     } else {
                         TabContentScreen(
+                            isLoading = isLoading,
                             listBook = incomeList,
                             onNavigateToEdit = onNavigateToEdit,
                             deleteBook = deleteBook
@@ -94,6 +98,7 @@ private fun TabsContent(
                         EmptyView(hintText = "Mulai catat pengeluaran anda")
                     } else {
                         TabContentScreen(
+                            isLoading = isLoading,
                             listBook = expenseList,
                             onNavigateToEdit = onNavigateToEdit,
                             deleteBook = deleteBook

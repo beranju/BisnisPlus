@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -56,51 +57,30 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EditBookRecordScreen(
-    state: BookStates<BookModel>,
-    updateBookState: BookStates<Unit>,
+    state: BooksState,
     onNavigateBack: () -> Unit,
     getBookById: () -> Unit,
     onUpdateBook: (BookModel) -> Unit,
     bookId: String,
     modifier: Modifier = Modifier
 ) {
-    when (state) {
-        is BookStates.Loading -> getBookById()
-        is BookStates.Error -> {
-            Box(
-                modifier = Modifier
-                    .padding(12.dp)
-                    .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = state.message)
-            }
-        }
-
-        is BookStates.Success -> {
-            EditBookRecordContent(
-                bookModel = state.data,
-                onNavigateBack = onNavigateBack,
-                onUpdateBook = onUpdateBook,
-                bookId = bookId
-            )
+    LaunchedEffect(key1 = state.isLoading) {
+        if (state.isLoading) {
+            getBookById()
         }
     }
-    when (updateBookState) {
-        is BookStates.Loading -> getBookById()
-        is BookStates.Error -> {
-            Box(
-                modifier = Modifier
-                    .padding(12.dp)
-                    .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = updateBookState.message)
-            }
+    LaunchedEffect(key1 = state.isSuccess) {
+        if (state.isSuccess) {
+            onNavigateBack()
         }
-
-        is BookStates.Success -> onNavigateBack()
     }
+
+    EditBookRecordContent(
+        bookModel = state.book,
+        onNavigateBack = onNavigateBack,
+        onUpdateBook = onUpdateBook,
+        bookId = bookId
+    )
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -276,7 +256,6 @@ fun EditBookRecordContent(
                         onCalendarSelection = { newDate ->
                             selectedDate = newDate
                         },
-                        selectedDate = selectedDate,
                         onGetContact = {
                             if (permissionState.hasPermission) {
                                 pickContactLauncher.launch(contactIntent)

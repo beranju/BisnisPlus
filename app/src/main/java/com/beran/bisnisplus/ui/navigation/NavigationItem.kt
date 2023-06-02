@@ -2,7 +2,6 @@ package com.beran.bisnisplus.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.ListAlt
 import androidx.compose.material.icons.outlined.Settings
@@ -25,11 +24,6 @@ val navigationItem = listOf(
         title = "Statistik",
         icon = Icons.Outlined.Analytics,
         screen = MainScreen.Statistik
-    ),
-    NavigationItem(
-        title = "Tagihan",
-        icon = Icons.Outlined.CreditCard,
-        screen = MainScreen.Pembayaran
     ),
     NavigationItem(
         title = "Setting",

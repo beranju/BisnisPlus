@@ -1,14 +1,19 @@
 package com.beran.bisnisplus.ui.screen.pembukuan
 
-sealed class BookState<out R> private constructor() {
-    data class Success<T>(val data: T) : BookState<T>()
-    data class Error(val message: String) : BookState<Nothing>()
-    object Loading : BookState<Nothing>()
-    object Initial : BookState<Nothing>()
-}
+import android.net.Uri
+import com.beran.core.domain.model.BookModel
+import com.beran.core.domain.model.UserModel
 
-sealed class BookStates<out R> private constructor() {
-    data class Success<T>(val data: T) : BookStates<T>()
-    data class Error(val message: String) : BookStates<Nothing>()
-    object Loading : BookStates<Nothing>()
-}
+data class BooksState(
+    val book: BookModel = BookModel(),
+    val books: List<BookModel> = emptyList(),
+    val incomeBooks: List<Pair<Long?, List<BookModel>>> = emptyList(),
+    val expenseBooks: List<Pair<Long?, List<BookModel>>> = emptyList(),
+    val incomeAmount : Double = 0.0,
+    val expenseAmount : Double = 0.0,
+    val uri: Uri = Uri.EMPTY,
+    val user: UserModel? = null,
+    val isLoading: Boolean = false,
+    val isSuccess: Boolean = false,
+    val error: String? = null
+)

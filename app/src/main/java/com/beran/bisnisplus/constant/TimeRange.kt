@@ -5,5 +5,5 @@ enum class TimeRange(val range: String) {
     Yesterday("Kemarin"),
     Week("Minggu ini"),
     Month("Bulan ini"),
-    Custom("Pilih tanggal sendiri")
+    All("Semua")
 }

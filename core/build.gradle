@@ -57,8 +57,11 @@ dependencies {
 
     // ** opencsv -> collection to .csv
     implementation 'com.opencsv:opencsv:5.5.2'
+    implementation "org.apache.commons:commons-csv:1.10.0"
 
     // ** midtrans sandbox
     implementation 'com.midtrans:uikit:2.0.0-SANDBOX'
+
+    implementation 'id.zelory:compressor:3.0.1'
 
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.beran.bisnisplus.R
@@ -44,9 +45,11 @@ fun CustomImagePickerCircle(
             .width(150.dp)
             .height(170.dp)
     ) {
-        Image(
-            painter = if (imageUri != null) painter else painterResource(id = R.drawable.img_empty_profile),
+        AsyncImage(
+            model =imageUri,
             contentDescription = "set photo",
+            placeholder = painterResource(id = R.drawable.img_empty_profile),
+            error = painterResource(id = R.drawable.img_empty_profile),
             contentScale = ContentScale.Crop,
             alignment = Alignment.Center,
             modifier = Modifier

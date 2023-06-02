@@ -12,8 +12,6 @@ class BisnisInteractor(private val repository: IBisnisRepository) : BisnisUseCas
         repository.createNewBisnis(businessModel)
 
     override fun editBisnisData(
-        bisnisName: String,
-        bisnisCategory: String,
-        commodity: String
-    ): Flow<Resource<Unit>> = repository.editBisnisData(bisnisName, bisnisCategory, commodity)
+        businessModel: BusinessModel
+    ): Flow<Resource<Unit>> = repository.editBisnisData(businessModel)
 }

@@ -1,31 +1,62 @@
 package com.beran.bisnisplus.ui.screen.setting.common
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.beran.core.common.Resource
+import com.beran.core.domain.model.BusinessModel
 import com.beran.core.domain.model.UserModel
 import com.beran.core.domain.usecase.AuthUseCase
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.beran.core.domain.usecase.bisnis.BisnisUseCase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class SettingViewModel(private val authUseCase: AuthUseCase) : ViewModel() {
+class SettingViewModel(private val authUseCase: AuthUseCase, private val bisnisUseCase: BisnisUseCase) : ViewModel() {
 
-    private var _user: MutableStateFlow<SettingState<UserModel>> =
-        MutableStateFlow(SettingState.Loading)
-    val user get() = _user.asStateFlow()
+    private var _state: MutableState<SettingState> = mutableStateOf(SettingState())
+    val state: State<SettingState> get() = _state
 
-    private var _uiState: MutableStateFlow<SettingStates<Unit>> =
-        MutableStateFlow(SettingStates.Initial)
-    val uiState get() = _uiState.asStateFlow()
+    init {
+        fetchCurrentUser()
+    }
 
     fun fetchCurrentUser() {
         viewModelScope.launch {
             authUseCase.userDetail().collect { result ->
                 when (result) {
-                    is Resource.Loading -> _user.value = SettingState.Loading
-                    is Resource.Error -> _user.value = SettingState.Error(result.message)
-                    is Resource.Success -> _user.value = SettingState.Success(result.data)
+                    is Resource.Loading -> _state.value =
+                        _state.value.copy(isLoading = true, error = null)
+
+                    is Resource.Error -> _state.value =
+                        _state.value.copy(isLoading = false, error = result.message)
+
+                    is Resource.Success -> _state.value =
+                        _state.value.copy(isLoading = false,user = result.data, error = null)
+                }
+            }
+        }
+    }
+
+    fun completeUserProfile(userModel: UserModel, businessModel: BusinessModel){
+        viewModelScope.launch {
+           withContext(Dispatchers.IO) { updateProfile(userModel) }
+            bisnisUseCase.createNewBisnis(businessModel).collect{result ->
+                when (result) {
+                    is Resource.Loading -> _state.value =
+                        _state.value.copy(isLoading = true, error = null)
+
+                    is Resource.Error -> _state.value =
+                        _state.value.copy(isLoading = false, error = result.message)
+
+                    is Resource.Success -> {
+                        _state.value =
+                            _state.value.copy(isLoading = false, isSuccess = true, error = null)
+                        fetchCurrentUser()
+                    }
                 }
             }
         }
@@ -35,9 +66,17 @@ class SettingViewModel(private val authUseCase: AuthUseCase) : ViewModel() {
         viewModelScope.launch {
             authUseCase.updateProfile(userModel).collect { result ->
                 when (result) {
-                    is Resource.Loading -> _uiState.value = SettingStates.Loading
-                    is Resource.Success -> _uiState.value = SettingStates.Success(result.data)
-                    is Resource.Error -> _uiState.value = SettingStates.Error(result.message)
+                    is Resource.Loading -> _state.value =
+                        _state.value.copy(isLoading = true, error = null)
+
+                    is Resource.Error -> _state.value =
+                        _state.value.copy(isLoading = false, error = result.message)
+
+                    is Resource.Success -> {
+                        _state.value =
+                            _state.value.copy(isLoading = false, isSuccess = true, error = null)
+                        fetchCurrentUser()
+                    }
                 }
             }
         }
@@ -47,5 +86,10 @@ class SettingViewModel(private val authUseCase: AuthUseCase) : ViewModel() {
         viewModelScope.launch {
             authUseCase.logOut()
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.cancel()
     }
 }

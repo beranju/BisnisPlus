@@ -16,12 +16,16 @@ object Constant {
 
     const val timeStamp = "createdAt"
 
+    //** user
+    const val uid = "uid"
+
     // ** book screen usage
     const val Income = "Pemasukan"
     const val Expense = "Pengeluaran"
 
     // ** books constant
     const val bookId = "bookId"
+    const val createdAt = "createdAt"
 
     // ** error Text
     const val UnknownError = "Something went wrong!"

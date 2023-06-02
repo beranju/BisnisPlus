@@ -2,10 +2,14 @@ package com.beran.bisnisplus.utils
 
 import android.content.ContentResolver
 import android.content.Context
+import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.provider.ContactsContract
+import android.provider.DocumentsContract
+import android.provider.MediaStore
+import android.provider.OpenableColumns
 import com.beran.core.domain.model.Contact
 import java.io.File
 import java.io.FileInputStream
@@ -13,11 +17,9 @@ import java.io.FileOutputStream
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.time.Instant
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.TextStyle
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -61,6 +63,23 @@ object Utils {
         return null
     }
 
+    fun getFilePathFromUri(context: Context, uri: Uri): String? {
+        var filePath: String? = null
+        val projection = arrayOf(OpenableColumns.DISPLAY_NAME)
+        val contentResolver = context.contentResolver
+        val cursor: Cursor? = contentResolver.query(uri, projection, null, null, null)
+        if (cursor == null){
+            filePath = uri.path
+        }else{
+            cursor.moveToFirst()
+            val index = cursor.getColumnIndex(MediaStore.DownloadColumns.DISPLAY_NAME)
+        }
+
+        cursor?.close()
+        return filePath
+
+    }
+
     fun getFileFromUri(context: Context, uri: Uri): String? {
         val contentResolver = context.contentResolver
         val parcelFileDescriptor: ParcelFileDescriptor? =
@@ -81,5 +100,6 @@ object Utils {
     fun generateUUid(): String {
         return UUID.randomUUID().toString()
     }
+
 
 }

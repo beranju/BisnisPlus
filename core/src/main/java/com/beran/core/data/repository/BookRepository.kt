@@ -1,16 +1,17 @@
 package com.beran.core.data.repository
 
+import android.net.Uri
 import android.os.Build
-import androidx.annotation.RequiresApi
+import android.os.Environment
 import com.beran.core.common.Constant
 import com.beran.core.common.Resource
 import com.beran.core.common.asMap
 import com.beran.core.domain.model.BookModel
 import com.beran.core.domain.repository.IBookRepository
+import com.beran.core.utils.Utils.writeCsv
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.opencsv.CSVWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +22,8 @@ import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import java.io.File
 import java.io.FileWriter
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class BookRepository(
     private val firestore: FirebaseFirestore,
@@ -118,10 +121,14 @@ class BookRepository(
                                 return@addSnapshotListener
                             }
                             if (snapshot != null && !snapshot.isEmpty) {
-                                val bookData = snapshot.map { queryDocumentSnapshot ->
-                                    queryDocumentSnapshot.toObject(BookModel::class.java)
+                                if (snapshot.documents.isNotEmpty()) {
+                                    val bookData = snapshot.map { queryDocumentSnapshot ->
+                                        queryDocumentSnapshot.toObject(BookModel::class.java)
+                                    }
+                                    trySend(Resource.Success(bookData))
+                                } else {
+                                    trySend(Resource.Success(emptyList()))
                                 }
-                                trySend(Resource.Success(bookData))
                             }
                         }
                 // ** stop to listen
@@ -136,65 +143,91 @@ class BookRepository(
             }
         }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    override suspend fun exportDataIntoCsv(filePath: String): Flow<Resource<Unit>> =
+    override fun fetchBookByDates(firstDate: Long, lastDate: Long): Flow<Resource<List<BookModel>>> = callbackFlow {
+        trySend(Resource.Loading)
+        try {
+            val listenerRegistration =
+                firestore.collection(Constant.bookRef).document(userDocName).collection("books")
+                    .whereGreaterThanOrEqualTo(Constant.createdAt, firstDate).whereLessThanOrEqualTo(Constant.createdAt, lastDate)
+                    .orderBy(Constant.timeStamp, Query.Direction.DESCENDING)
+                    .addSnapshotListener { snapshot, error ->
+                        error?.let {
+                            trySend(Resource.Error("onError: ${error.message}"))
+                            return@addSnapshotListener
+                        }
+                        if (snapshot != null && !snapshot.isEmpty) {
+                            if (snapshot.documents.isNotEmpty()) {
+                                val bookData = snapshot.map { queryDocumentSnapshot ->
+                                    queryDocumentSnapshot.toObject(BookModel::class.java)
+                                }
+                                trySend(Resource.Success(bookData))
+                            } else {
+                                trySend(Resource.Success(emptyList()))
+                            }
+                        }
+                    }
+            // ** stop to listen
+            awaitClose {
+                listenerRegistration.remove()
+                // ** use channel.close() instead cancel() to avoid force close
+                channel.close()
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
+            trySend(Resource.Error(e.message ?: Constant.UnknownError))
+        }
+    }
+
+    override fun fetchBookBySingleDate(date: Long): Flow<Resource<List<BookModel>>> = callbackFlow {
+        trySend(Resource.Loading)
+        try {
+
+        }catch (e: Exception){
+            e.printStackTrace()
+            trySend(Resource.Error(e.message ?: Constant.UnknownError))
+        }
+    }
+
+
+    override suspend fun exportDataIntoCsv(): Flow<Resource<Uri>> =
         flow {
             emit(Resource.Loading)
             try {
-                val file = File(filePath)
-                if (!file.exists()) {
-                    file.parentFile?.mkdirs() // Create parent directories if they don't exist
-                    file.createNewFile() // Create the actual file
-                }
-                val writer = CSVWriter(FileWriter(file))
-//                    val headers = arrayOf(
-//                        "Book ID",
-//                        "Business ID",
-//                        "Amount",
-//                        "Mitra",
-//                        "Note",
-//                        "Category",
-//                        "Type",
-//                        "State",
-//                        "Stock",
-//                        "Created At",
-//                        "Updated At"
-//                    )
-//                    writer.writeNext(headers)
-                writer.writeNext(arrayOf("id"))
-
+                val fileName = "BisnisPlusReport-${System.currentTimeMillis()}.csv"
+                val folder =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                val path = File(folder, fileName)
+                // ** perubahan pada filepath belum ditest dan dicoba
+                val writer =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        Files.newBufferedWriter(Paths.get(path.absolutePath))
+                    } else {
+                        FileWriter(path)
+                    }
                 val bookSnapShot =
                     bookRef.document(userDocName).collection(Constant.books).get().await()
-                for (doc in bookSnapShot.documents) {
-                    writer.writeNext(arrayOf("${doc.data?.get("bookId")}"))
-//                        val book: BookModel? = doc.toObject(BookModel::class.java)
-//                        Timber.tag("BookRepository").i("buku : $book")
-//                        if (book != null) {
-//                            val bookRow = arrayOf(
-//                                book.bookId.toString(),
-//                                book.bisnisId.toString(),
-//                                book.amount.toString(),
-//                                book.mitra.toString(),
-//                                book.note.toString(),
-//                                book.category.toString(),
-//                                book.type.toString(),
-//                                book.state.toString(),
-//                                book.listStock?.stocks.toString(),
-//                                Utils.convertToDate(book.createdAt ?: 0).toString(),
-//                                Utils.convertToDate(book.updatedAt ?: 0).toString()
-//                            )
-//                            writer.writeNext(bookRow)
-//                        }else{
-//                            Timber.tag("BookRepository").i("Empty data for ${doc.id}")
-//                        }
+                val books: List<BookModel> = bookSnapShot.documents.map {
+                    it.toObject(BookModel::class.java) as BookModel
                 }
+                writer.writeCsv(books)
+                writer.flush()
                 writer.close()
-                emit(Resource.Success(Unit))
-
+                val filePath = Uri.fromFile(path)
+                emit(Resource.Success(filePath))
+                // ** this code use to convert the data into pdf file
+//                val csvData: MutableList<Array<String>> = mutableStateListOf()
+//                for (doc in bookSnapShot.documents) {
+//                    Timber.tag("REpositoyr").i("convert to pdf...")
+//                    Utils.generatePdf(doc, "/storage/emulated/0/Download/bisnisplusdata2.pdf")
+//                    Timber.tag("REpositoyr").i("convert to pdf success")
+//                    val book: BookModel? = doc.toObject(BookModel::class.java)
+//                    Timber.tag("BookRepository").i("buku : $book")
+//                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 Timber.tag("Bookrepository").e(e)
                 emit(Resource.Error(e.message ?: Constant.UnknownError))
             }
         }.flowOn(Dispatchers.IO)
+
 }

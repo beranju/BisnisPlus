@@ -4,7 +4,6 @@ import com.beran.core.common.Constant
 import com.beran.core.common.Resource
 import com.beran.core.domain.model.BusinessModel
 import com.beran.core.domain.repository.IBisnisRepository
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -45,12 +44,18 @@ class BisnisRepository(
         }.flowOn(Dispatchers.IO)
 
     override fun editBisnisData(
-        bisnisName: String,
-        bisnisCategory: String,
-        commodity: String
+        businessModel: BusinessModel
     ): Flow<Resource<Unit>> =
         flow {
-            emit(Resource.Success(Unit))
+            emit(Resource.Loading)
+            try {
+
+
+                emit(Resource.Success(Unit))
+            }catch (e: Exception){
+                e.printStackTrace()
+                emit(Resource.Error(e.message ?: Constant.UnknownError))
+            }
         }
 
 }

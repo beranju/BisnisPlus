@@ -18,14 +18,17 @@ fun CustomDataFormField(
     textHint: String,
     value: String,
     onChangeValue: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(text = labelName, style = MaterialTheme.typography.labelMedium)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = value,
             onValueChange = onChangeValue,
             singleLine = true,
+            enabled = enabled,
             placeholder = {
                 Text(text = textHint, style = MaterialTheme.typography.bodyMedium)
             },

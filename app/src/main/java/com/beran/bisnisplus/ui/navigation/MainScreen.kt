@@ -5,7 +5,6 @@ sealed class MainScreen(val route: String) {
 
     object Pembukuan : Screen(route = "pembukuan")
     object CreateNewRecord : Screen(route = "pembukuan/create")
-    object FinancialStatement : Screen(route = "pembukuan/report")
     object EditBookRecord : Screen(route = "pembukuan/{bookId}"){
         fun createRoute(bookId: String) = "pembukuan/$bookId"
     }
@@ -18,5 +17,6 @@ sealed class MainScreen(val route: String) {
 
     object Setting : Screen("setting")
     object EditProfileUser : Screen("editProfileUser")
+    object UpdateDataBisnis : Screen("setting/updatebisnis")
     object Notification: Screen("notification")
 }

@@ -9,6 +9,7 @@ import com.beran.core.domain.usecase.AuthUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class SignUpViewModel(private val useCase: AuthUseCase) : ViewModel() {
     private var _uiState: MutableStateFlow<SignUpState<Unit>> =
@@ -33,7 +34,10 @@ class SignUpViewModel(private val useCase: AuthUseCase) : ViewModel() {
                 when(result){
                     is Resource.Loading -> _uiState.value = SignUpState.Loading
                     is Resource.Error -> _uiState.value = SignUpState.Error(result.message)
-                    is Resource.Success -> _uiState.value = SignUpState.Success(Unit)
+                    is Resource.Success -> {
+                        Timber.tag("SignViewModel").i("data: ${result.data}")
+                        _uiState.value = SignUpState.Success(Unit)
+                    }
                 }
 
             }

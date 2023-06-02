@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.beran.bisnisplus.constant.BookTypes
 import com.beran.core.common.Resource
+import com.beran.core.domain.model.BookModel
 import com.beran.core.domain.usecase.book.BookUseCase
 import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.cancel
@@ -28,10 +29,10 @@ class StatisticViewModel(private val bookUseCase: BookUseCase) : ViewModel() {
                          * disini saya mengelompokkan data yang memiliki timestamp yang sama...
                          * ...kemudian saya melakukan loop untuk menmbahkan data kedalam listDataEntry
                          */
-                        val listIncome =
-                            result.data.filter { it.type == BookTypes.Pemasukan.string }
-                        val listExpense =
-                            result.data.filter { it.type == BookTypes.Pengeluaran.string }
+                        val list = result.data
+                        val listIncome = filteredList(list, BookTypes.Pemasukan.string)
+
+                        val listExpense = filteredList(list, BookTypes.Pengeluaran.string)
 
                         val groupedIncome = listIncome.groupBy { it.createdAt }.toSortedMap(
                             compareBy { it }
@@ -47,8 +48,12 @@ class StatisticViewModel(private val bookUseCase: BookUseCase) : ViewModel() {
                             Entry(index.toFloat(), data.sumOf { it.amount }.toFloat())
                         }
 
-                        val incomeStartDate = listIncome.last().createdAt
-                        val expenseStartDate = listExpense.last().createdAt
+                        val incomeStartDate = if (listIncome.isNotEmpty()) {
+                            listIncome.last().createdAt
+                        } else 0
+                        val expenseStartDate = if (listExpense.isNotEmpty()) {
+                            listExpense.last().createdAt
+                        } else 0
 
                         _state.value = _state.value.copy(
                             loading = false,
@@ -68,6 +73,9 @@ class StatisticViewModel(private val bookUseCase: BookUseCase) : ViewModel() {
             }
         }
     }
+
+    private fun filteredList(data: List<BookModel>, type: String): List<BookModel> =
+        data.filter { it.type == type }
 
     override fun onCleared() {
         super.onCleared()

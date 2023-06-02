@@ -7,8 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,7 +33,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     state: HomeStates,
-    scaffoldState: ScaffoldState,
+    snackBarHostState: SnackbarHostState,
     onNavigateToCreateBook: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToStatistic: () -> Unit,
@@ -68,7 +67,7 @@ fun HomeScreen(
         error = state.error
         if (error?.isNotEmpty() == true) {
             scope.launch {
-                scaffoldState.snackbarHostState.showSnackbar(
+                snackBarHostState.showSnackbar(
                     message = "Terjadi kesalahan, coba lagi!"
                 )
             }
@@ -78,7 +77,7 @@ fun HomeScreen(
         isSuccess = state.isSuccess
         if (isSuccess) {
             scope.launch {
-                scaffoldState.snackbarHostState.showSnackbar(
+                snackBarHostState.showSnackbar(
                     message = "Buku berhasil di hapus"
                 )
             }
@@ -96,7 +95,7 @@ fun HomeScreen(
         }
         if (!isNetworkAvailable) {
             scope.launch {
-                scaffoldState.snackbarHostState.showSnackbar(
+                snackBarHostState.showSnackbar(
                     message = "Anda tidak memiliki koneksi internet"
                 )
             }
@@ -138,7 +137,7 @@ fun HomeScreenPrev() {
     BisnisPlusTheme {
         HomeScreen(
             state = HomeStates(),
-            scaffoldState = rememberScaffoldState(),
+            snackBarHostState = SnackbarHostState(),
             onNavigateToCreateBook = {},
             onNavigateToProfile = {},
             onNavigateToStatistic = {},

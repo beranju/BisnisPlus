@@ -36,6 +36,7 @@ fun CustomDropDown(
     selectedValue: String,
     onChangeValue: (String) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     label: String? = null,
     hint: String? = null,
 ) {
@@ -55,6 +56,7 @@ fun CustomDropDown(
                 OutlinedTextField(
                     value = selectedValue,
                     readOnly = true,
+                    enabled = enabled,
                     onValueChange = onChangeValue,
                     trailingIcon = {
                         Icon(

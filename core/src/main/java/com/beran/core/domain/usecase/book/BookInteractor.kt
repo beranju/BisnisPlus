@@ -1,5 +1,6 @@
 package com.beran.core.domain.usecase.book
 
+import android.net.Uri
 import com.beran.core.common.Resource
 import com.beran.core.domain.model.BookModel
 import com.beran.core.domain.repository.IBookRepository
@@ -19,5 +20,10 @@ class BookInteractor(private val repository: IBookRepository) : BookUseCase {
     override fun fetchAllBook(): Flow<Resource<List<BookModel>>> =
         repository.fetchAllBook()
 
-    override suspend fun exportDataIntoCsv(filePath: String): Flow<Resource<Unit>> = repository.exportDataIntoCsv(filePath)
+    override fun fetchBookByDates(
+        firstDate: Long,
+        lastDate: Long
+    ): Flow<Resource<List<BookModel>>> = repository.fetchBookByDates(firstDate, lastDate)
+
+    override suspend fun exportDataIntoCsv(): Flow<Resource<Uri>> = repository.exportDataIntoCsv()
 }

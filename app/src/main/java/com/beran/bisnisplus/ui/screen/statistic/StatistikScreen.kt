@@ -19,6 +19,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,8 +37,6 @@ import com.beran.bisnisplus.ui.screen.statistic.common.LineChartView
 import com.beran.bisnisplus.ui.theme.BisnisPlusTheme
 import com.github.mikephil.charting.data.Entry
 
-private const val width = 350.0
-private const val height = 400.0
 
 @Composable
 fun StatistikScreen(
@@ -42,6 +45,16 @@ fun StatistikScreen(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
+    var loading by remember {
+        mutableStateOf(state.loading)
+    }
+    LaunchedEffect(key1 = state.loading){
+        loading = state.loading
+        if (state.loading){
+            fetchData()
+        }
+
+    }
 
     Column(
         modifier = modifier
@@ -50,29 +63,24 @@ fun StatistikScreen(
     )
     {
         ExportDataSection()
-        if (state.loading) {
-            fetchData()
-            CircularProgressIndicator()
-        } else if (state.error?.isNotEmpty() == true) {
-            ErrorView(errorText = state.error, modifier = Modifier.fillMaxSize())
-        } else {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.verticalScroll(scrollState)
-            ) {
-                StatisticSection(
-                    title = "Statistik Pemasukan",
-                    chartData = state.listIncomeDate,
-                    startDate = state.incomeStartDate ?: 0
-                )
-                StatisticSection(
-                    title = "Statistik Pengeluaran",
-                    chartData = state.listExpenseData,
-                    startDate = state.expenseStartDate ?: 0,
-                    isIncome = false
-                )
-            }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.verticalScroll(scrollState)
+        ) {
+            StatisticSection(
+                title = "Statistik Pemasukan",
+                chartData = state.listIncomeDate,
+                startDate = state.incomeStartDate ?: 0
+            )
+            StatisticSection(
+                title = "Statistik Pengeluaran",
+                chartData = state.listExpenseData,
+                startDate = state.expenseStartDate ?: 0,
+                isIncome = false
+            )
         }
+
     }
 }
 
